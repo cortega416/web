@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            background-color: #0b626a;
+            color: #333333;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming - Tienda Digital - HANS WEB</title>
+    <meta name="description" content="Servicios de streaming y entretenimiento digital: Netflix, Disney+, Amazon Prime Video y más">
+    <meta name="keywords" content="Netflix, Disney+, Amazon Prime, streaming, entretenimiento digital">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/tienda.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header con carrito -->
+    <header class="global-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <a href="../index.html" class="brand-link">
+                    <h1 class="brand-logo">
+                        <i class="fas fa-globe"></i>
+                        HANS WEB
+                    </h1>
+                </a>
+            </div>
+            
+            <!-- Navegación Desktop -->
+            <nav class="main-nav desktop-nav">
+                <div class="nav-item dropdown">
+                    <a href="../tienda.html" class="nav-link active">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Tienda</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="windowsoffice.html">Windows y Office</a>
+                        <a href="programas.html">Programas</a>
+                        <a href="streaming.html" class="active">Streaming</a>
+                    </div>
+                </div>
+                <a href="../gestion-codigos.html" class="nav-link">
+                    <i class="fas fa-key"></i>
+                    <span>Gestión de Códigos</span>
+                </a>
+                <a href="../correo-temporal.html" class="nav-link">
+                    <i class="fas fa-envelope"></i>
+                    <span>Correo Temporal</span>
+                </a>
+            </nav>
+
+            <!-- Header Actions con carrito -->
+            <div class="header-actions">
+                <a href="../index.html" class="btn-home">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                
+                <!-- Botón del carrito -->
+                <button class="cart-btn" id="cartBtn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menú móvil lateral -->
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <h3>HANS WEB</h3>
+            <button class="sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../tienda.html" class="sidebar-link active">
+                <i class="fas fa-shopping-cart"></i>
+                Tienda
+            </a>
+            <div class="sidebar-submenu">
+                <a href="windowsoffice.html">Windows y Office</a>
+                <a href="programas.html">Programas</a>
+                <a href="streaming.html" class="active">Streaming</a>
+            </div>
+            <a href="../gestion-codigos.html" class="sidebar-link">
+                <i class="fas fa-key"></i>
+                Gestión de Códigos
+            </a>
+            <a href="../correo-temporal.html" class="sidebar-link">
+                <i class="fas fa-envelope"></i>
+                Correo Temporal
+            </a>
+        </nav>
+    </div>
+
+    <!-- Carrito lateral -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>
+                <i class="fas fa-shopping-cart"></i>
+                Carro de la Compra
+            </h3>
+            <button class="cart-close" id="cartClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-content" id="cartContent">
+            <div class="cart-empty">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Tu carrito está vacío</p>
+                <small>Añade productos para comenzar tu compra</small>
+            </div>
+        </div>
+        
+        <div class="cart-footer" id="cartFooter">
+            <div class="cart-totals">
+                <div class="cart-subtotal">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">S/ 0.00</span>
+                </div>
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cartTotal">S/ 0.00</span>
+                </div>
+            </div>
+            <button class="btn-checkout" id="checkoutBtn">
+                <i class="fab fa-whatsapp"></i>
+                Finalizar Compra
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <div class="container">
+                <a href="../index.html">Inicio</a>
+                /
+                <a href="../tienda.html">Tienda</a>
+                / Streaming
+            </div>
+        </div>
+
+        <!-- Cabecera de categoría -->
+        <section class="products-section">
+            <div class="container">
+                <div class="products-header">
+                    <div class="products-title">
+                        <h1>Streaming</h1>
+                        <p>Servicios de streaming y entretenimiento digital para disfrutar del mejor contenido</p>
+                    </div>
+                    <div class="products-controls">
+                        <select id="sortSelect" class="sort-select">
+                            <option value="default">Orden predeterminado</option>
+                            <option value="price-low">Precio: de bajo a alto</option>
+                            <option value="price-high">Precio: de alto a bajo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid de productos -->
+                <div class="products-grid" id="productsGrid">
+                    <!-- Netflix Premium -->
+                    <div class="product-card" data-product-id="netflix-premium-001" data-category="streaming" data-price="12.00">
+                        <div class="product-image" onclick="openProduct('')">
+                            <img src="../img/Netflix-1.png" alt="Netflix Premium" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('')">Netflix Premium (1 mes)</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Perfil con su nombre con plan Ultra HD y bot para códigos de hogar.</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 12.00</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- HBO Max -->
+                    <div class="product-card" data-product-id="hbo-max-001" data-category="streaming" data-price="5.96">
+                        <div class="product-image" onclick="openProduct('Streaming/hbo.html')">
+                            <img src="../img/HBOMax.png" alt="HBO Max" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('Streaming/hbo.html')">HBO Max Standard (1 mes)</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Cuenta Completa, renovables mes a mes con plan estándar</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 5.96</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- HBO Max -->
+                    <div class="product-card" data-product-id="hbo-max-002" data-category="streaming" data-price="3.96">
+                        <div class="product-image" onclick="openProduct('Streaming/hbo.html')">
+                            <img src="../img/HBOMax.png" alt="HBO Max" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('Streaming/hbo.html')">HBO Max Anuncios (1 mes)</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Cuenta Completa, renovables mes a mes con plan básico con Anuncios.</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 3.96</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Disney+ -->
+                    <div class="product-card" data-product-id="disney-plus-001" data-category="streaming" data-price="4.00">
+                        <div class="product-image" onclick="openProduct('Streaming/disney.html')">
+                            <img src="../img/disney-1.png" alt="Disney+" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('Streaming/disney.html')">Disney+ Estándar (1 mes)</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Perfil con su nombre con plan estándar y bot para códigos de hogar.</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 4.00</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-product-id="disney-plus-002" data-category="streaming" data-price="16.00">
+                        <div class="product-image" onclick="openProduct('Streaming/disney.html')">
+                            <img src="../img/disney-1.png" alt="Disney+" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('Streaming/disney.html')">Disney+ Estándar (1 mes)</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Cuenta Completa con plan estándar y bot para códigos de hogar.</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 16.00</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-product-id="disney-plus-003" data-category="streaming" data-price="25.00">
+                        <div class="product-image" onclick="openProduct('Streaming/disney.html')">
+                            <img src="../img/disney-1.png" alt="Disney+" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('Streaming/disney.html')">Disney+ Premium (1 mes)</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Cuenta Completa con plan Premium y bot para códigos de hogar.</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 25.00</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Spotify Premium -->
+                    <div class="product-card" data-product-id="spotify-premium-001" data-category="streaming" data-price="70.00">
+                        <div class="product-image" onclick="openProduct('Streaming/spotify.html')">
+                            <img src="../img/spotify.png" alt="Spotify Premium" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('Streaming/spotify.html')">Spotify Premium (1 año)</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Renovación o nueva a tu correo, se te agrega a un plan familiar.</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 70.00</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Deezer -->
+                    <div class="product-card" data-product-id="deezer-001" data-category="streaming" data-price="4.00">
+                        <div class="product-image" onclick="openProduct('Streaming/deezer.html')">
+                            <img src="../img/deezer.png" alt="Spotify Premium" onerror="this.src='../img/placeholder.jpg'">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title" onclick="openProduct('Streaming/deezer.html')">Deezer Premium</h3>
+                            <h3 class="product-sub">
+                                <ul>
+                                    <p>Renovación o nueva a tu correo, duración variable.</p>
+                                </ul>  
+                            </h3>
+                            <div class="product-price">S/ 4.00</div>
+                            <button class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            <button class="btn-buy-now-a" onclick="window.HansWeb.buyNowFromCard(this)">
+                                <i class="fab fa-whatsapp"></i>
+                                Comprar Ahora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="global-footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Servicios</h4>
+                    <a href="../tienda.html">Tienda</a>
+                    <a href="../gestion-codigos.html">Gestión de Códigos</a>
+                    <a href="../correo-temporal.html">Correo Temporal</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Información</h4>
+                    <a href="#guias">Guías</a>
+                    <a href="#contacto">Contacto</a>
+                    <a href="#terminos">Términos y Condiciones</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Síguenos</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-telegram"></i>
+                            Telegram
+                        </a>
+                        <a href="https://wa.me/51965485348" class="social-link">
+                            <i class="fab fa-whatsapp"></i>
+                            WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 HANS WEB - Desarrollado por @romel.jeans</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Overlay para carrito -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <script src="../js/global.js"></script>
+    <script src="../js/carrito.js"></script>
+    <script>
+        // Funciones específicas para esta página
+        function openProduct(url) {
+            document.body.style.opacity = '0.8';
+            setTimeout(() => {
+                window.location.href = url;
+            }, 200);
+        }
+
+        // Ordenamiento de productos
+        document.addEventListener('DOMContentLoaded', function() {
+            const sortSelect = document.getElementById('sortSelect');
+            const productsGrid = document.getElementById('productsGrid');
+
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    const sortValue = this.value;
+                    const products = Array.from(productsGrid.children);
+
+                    products.sort((a, b) => {
+                        const priceA = parseFloat(a.dataset.price);
+                        const priceB = parseFloat(b.dataset.price);
+
+                        switch(sortValue) {
+                            case 'price-low':
+                                return priceA - priceB;
+                            case 'price-high':
+                                return priceB - priceA;
+                            default:
+                                return 0;
+                        }
+                    });
+
+                    // Reordenar elementos en el DOM
+                    products.forEach(product => {
+                        productsGrid.appendChild(product);
+                    });
+                });
+            }
+        });
+</script>
+    </script>
+</body>
+</html>
