@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "tempmail-codigomanager",
+  "private_key_id": "6510037057a3a5a9e82f38369851592233a0f699",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDJy0nI+dL4cK/c\nvL0pd7jHv/mtg/J3CxqVf8MWDMMJqFVIpVJkgiM6Tcm2ay6dO/OfXq/+/FBOvGb3\nn+gN2cqtFqZ44A0dZGFKIAIwYkjxX8mEs0PQSIPsuWuknz6KsRDgxE5emxwA1l0l\nITqKvHShDhJaQ3crxIsq0uYUseSKl2ymRCrTsFBe7G920BjSBD3uquk9q4r6aEuy\nccee65qlHpwG3Op5JBdtbgecCNkRpodGWP+gSdv1SYGlnuZvnCJUo218l2BEhdRg\nnW08OrolpCtGYapzCegQu6+aA74EQv6sTsuOG8jpKGtD+sKjXXQxEkv2Su0jow+2\n4+AzyXpdAgMBAAECggEAVFOyitzzb8TPiQQKXJjeTAMKmJsqKNsoCc9xO/arTo7c\nzNXhX4UOqZ+2KpgRy70w6qmMDJduC+kpclONirQ3wStU9/BRKrY2/d3wbD22U7/+\nm4i6TwDuuG8n74xoe1bRQcxnH5vcEPGDzS9contslZ0myDenRlAFBClL4twQMGWm\ncjYlbVj+riEGmhgw7dp+cb1nldxISBLK4bRDYCZkh6OzSTUUgb/0EdByrMOuT2Zj\nLezqzmkTiFcyFuHKBqUnVgxL6Z9SdnXJr4dIeQx5etjJQ22d0d9IeU7MvUBx+GYl\nK9+DBFt57/rACx3VCu+dFLwg84b3u7BbtUC1DAe19QKBgQD22/b5PNqpe3FcBUyR\nKsGM5Acqpd7Jopf+bWn5cMWi2xFN04AbVMYUELxMcqeLvyaMzlONIChSUffCG+u6\nEOPZDtLMj1NhrS76xW4xY/x4i1fQWoiGe0YgDFFOpL7g4NwcHJtLUj8ovoSi259i\noRJBCHnTKRJqTlDSmqYpKoh4VwKBgQDRRCQDEkh3jTvvpDBDG5Os75IX5+ZY7Zjr\nFpTW+O9mdDr8xoHpfCLOyNlvSTbff2rgK+Apn9RYtZF07OfzPk0SEIJ0sfji8+CO\nWLSTaxfJToZiJ3yDiDhXZwKq89GDeoA2HlQLlmzWDPbhxMbeq3VsHnYAUMmehhdK\nJ1nzc5WCawKBgGK/iwQYe7/gSXBuDjrjx5j8foFo6L3v9K0qR4IowmZrC3j+afiE\n6NeN+kT6eFtGk70vq+yAOKD1eQ6E7L75kqt5aom5q7ke9fQKlhHb1VrDItWN4Z8q\nINshEkVLUa/TQzlbmCOBOxKpY5ViFVf25r5tDY6Sl3M+8MXOZzmAcibxAoGAH8Ix\nnO23Zb1fbT0Dvgt/W+13xH0DLlfQr0zcBcv9uRTGpvoRWTfnqG4+4W7BDyYtOBww\nhuCkv1m+23ngsb+wvp8WzVL9LKRKXhAER6MnFvv91QOdF/Eia9FMTFl4YHXE43Gy\n25dWqR2KkjTk4YIv7dqpmd6o2pALFMvoENRnykUCgYEAt/H3lPuaFmVxZWcAAywS\n0xybdvWMXsePVbJ3gOZgkuq9/5OkD/SoGodr5vFNzvmqAZ5bwcLW1V5gZxxb5PAs\n178MVyxs18Of6pv5hEN1UT6cukuWGM589dyH7pYGVcpRtvFwQkF+B1he8TJB9zTC\nlifzi5RDfYKqB8VjfusOrC4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "streaming-manager-sa@tempmail-codigomanager.iam.gserviceaccount.com",
+  "client_id": "118123238579805028075",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streaming-manager-sa%40tempmail-codigomanager.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
