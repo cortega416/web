@@ -59,6 +59,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="topbar">
+                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
                 <h2>Movimientos</h2>
                 <div class="topbar-actions">
                     <button class="btn btn-success" onclick="openModalMovimiento('entrada')">
@@ -210,5 +211,7 @@
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/movimientos.js"></script>
+    <script src="js/mobile.js"></script>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 </body>
 </html>

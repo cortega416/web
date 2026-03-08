@@ -198,7 +198,6 @@ async function populateServiciosSelect() {
     
     select.innerHTML = '<option value="">Seleccionar...</option>';
     serviciosActivos.forEach(servicio => {
-        // Verificar visibilidad según rol
         if (servicio.visible_para === 'admin' && !Auth.isAdmin()) {
             return;
         }
@@ -277,20 +276,20 @@ async function guardarCuenta() {
             if (servicio) {
                 const perfilesMax = parseInt(servicio.perfiles_max) || 1;
                 const perfilesRows = [];
+                const basePerfilId = await sheetsClient.getNextId(CONFIG.SHEETS.PERFILES);
                 
                 for (let i = 1; i <= perfilesMax; i++) {
-                    const perfilId = await sheetsClient.getNextId(CONFIG.SHEETS.PERFILES);
                     perfilesRows.push([
-                        perfilId + (i - 1),
+                        basePerfilId + (i - 1),
                         newId,
                         i,
-                        '',  // nombre
-                        '',  // pin
+                        '',
+                        '',
                         'disponible',
-                        '',  // cliente_id
-                        '',  // fecha_inicio
-                        '',  // fecha_fin
-                        ''   // notas
+                        '',
+                        '',
+                        '',
+                        ''
                     ]);
                 }
                 
@@ -436,10 +435,6 @@ function closeModalPerfiles() {
     currentCuentaId = null;
 }
 
-// Continuaré en el siguiente mensaje con las funciones de asignar, renovar, liberar y editar perfil...
-
-// CONTINUACIÓN DE CUENTAS.JS
-
 // Asignar perfil a cliente
 async function asignarPerfil(perfilId) {
     currentPerfilId = perfilId;
@@ -449,7 +444,6 @@ async function asignarPerfil(perfilId) {
     const cuenta = cuentas.find(c => c.id == perfil.cuenta_id);
     const servicio = cuenta ? servicios.find(s => s.id == cuenta.servicio_id) : null;
     
-    // Abrir modal de acción
     const modal = document.getElementById('modalAccionPerfil');
     const title = document.getElementById('modalAccionPerfilTitle');
     
@@ -522,8 +516,6 @@ async function liberarPerfil(perfilId) {
     loadingOverlay.classList.add('active');
     
     try {
-        const perfil = perfiles.find(p => p.id == perfilId);
-        
         // Actualizar perfil a disponible
         await sheetsClient.updateById(CONFIG.SHEETS.PERFILES, perfilId, {
             estado: 'disponible',
@@ -548,10 +540,8 @@ async function liberarPerfil(perfilId) {
         
         Utils.showNotification('Perfil liberado correctamente', 'success');
         
-        // Recargar datos
         await loadCuentas();
         
-        // Reabrir modal de perfiles
         if (currentCuentaId) {
             await verPerfiles(currentCuentaId);
         }
@@ -596,14 +586,32 @@ function closeModalAccionPerfil() {
     currentPerfilId = null;
 }
 
-// Ejecutar acción de perfil (asignar, renovar, editar)
+// *** CORRECCIÓN: Ejecutar acción de perfil ***
 async function ejecutarAccionPerfil() {
     const accionTipo = document.getElementById('accionTipo').value;
     const perfilId = document.getElementById('accionPerfilId').value;
     
+    // Validar según el tipo de acción
     if (accionTipo === 'asignar') {
+        const clienteId = document.getElementById('asignarCliente').value;
+        const precio = document.getElementById('asignarPrecio').value;
+        const duracion = document.getElementById('asignarDuracion').value;
+        
+        if (!clienteId || !precio || !duracion) {
+            alert('Por favor completa todos los campos requeridos');
+            return;
+        }
+        
         await ejecutarAsignacion(perfilId);
     } else if (accionTipo === 'renovar') {
+        const precio = document.getElementById('renovarPrecio').value;
+        const dias = document.getElementById('renovarDias').value;
+        
+        if (!precio || !dias) {
+            alert('Por favor completa todos los campos requeridos');
+            return;
+        }
+        
         await ejecutarRenovacion(perfilId);
     } else if (accionTipo === 'editar') {
         await ejecutarEdicion(perfilId);
@@ -612,21 +620,9 @@ async function ejecutarAccionPerfil() {
 
 // Ejecutar asignación
 async function ejecutarAsignacion(perfilId) {
-    const form = document.getElementById('formAccionPerfil');
-    
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    
     const clienteId = document.getElementById('asignarCliente').value;
     const precio = document.getElementById('asignarPrecio').value;
     const duracion = document.getElementById('asignarDuracion').value;
-    
-    if (!clienteId) {
-        alert('Debe seleccionar un cliente');
-        return;
-    }
     
     const loadingOverlay = document.getElementById('loadingOverlay');
     loadingOverlay.classList.add('active');
@@ -663,7 +659,7 @@ async function ejecutarAsignacion(perfilId) {
         ];
         await sheetsClient.appendRows(CONFIG.SHEETS.SUSCRIPCIONES, [suscripcionRow]);
         
-        // 3. Crear movimiento (entrada)
+        // 3. Crear movimiento
         const movimientoId = await sheetsClient.getNextId(CONFIG.SHEETS.MOVIMIENTOS);
         const movimientoRow = [
             movimientoId,
@@ -690,7 +686,7 @@ async function ejecutarAsignacion(perfilId) {
         
     } catch (error) {
         console.error('Error asignando perfil:', error);
-        Utils.showNotification('Error asignando perfil', 'error');
+        Utils.showNotification('Error asignando perfil: ' + error.message, 'error');
     } finally {
         loadingOverlay.classList.remove('active');
     }
@@ -698,13 +694,6 @@ async function ejecutarAsignacion(perfilId) {
 
 // Ejecutar renovación
 async function ejecutarRenovacion(perfilId) {
-    const form = document.getElementById('formAccionPerfil');
-    
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    
     const precio = document.getElementById('renovarPrecio').value;
     const diasAdicionales = document.getElementById('renovarDias').value;
     
@@ -717,7 +706,6 @@ async function ejecutarRenovacion(perfilId) {
         const servicio = servicios.find(s => s.id == cuenta.servicio_id);
         const session = Auth.getSession();
         
-        // Calcular nueva fecha de fin
         const fechaFinActual = perfil.fecha_fin || Utils.getCurrentDate();
         const nuevaFechaFin = Utils.addDays(fechaFinActual, parseInt(diasAdicionales));
         
@@ -737,7 +725,7 @@ async function ejecutarRenovacion(perfilId) {
             });
         }
         
-        // 3. Crear movimiento (entrada por renovación)
+        // 3. Crear movimiento
         const movimientoId = await sheetsClient.getNextId(CONFIG.SHEETS.MOVIMIENTOS);
         const movimientoRow = [
             movimientoId,
@@ -764,7 +752,7 @@ async function ejecutarRenovacion(perfilId) {
         
     } catch (error) {
         console.error('Error renovando perfil:', error);
-        Utils.showNotification('Error renovando perfil', 'error');
+        Utils.showNotification('Error renovando perfil: ' + error.message, 'error');
     } finally {
         loadingOverlay.classList.remove('active');
     }
@@ -796,7 +784,7 @@ async function ejecutarEdicion(perfilId) {
         
     } catch (error) {
         console.error('Error editando perfil:', error);
-        Utils.showNotification('Error editando perfil', 'error');
+        Utils.showNotification('Error editando perfil: ' + error.message, 'error');
     } finally {
         loadingOverlay.classList.remove('active');
     }

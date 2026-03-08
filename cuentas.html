@@ -59,6 +59,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="topbar">
+                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
                 <h2>Cuentas</h2>
                 <div class="topbar-actions">
                     <button class="btn btn-primary" id="btnNuevaCuenta" onclick="openModalCuenta()">
@@ -257,5 +258,7 @@
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/cuentas.js"></script>
+    <script src="js/mobile.js"></script>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 </body>
 </html>
