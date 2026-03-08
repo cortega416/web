@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas - Streaming Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎬 Streaming Manager</h1>
+                <div class="user-info">
+                    <span id="userDisplay"></span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="servicios.html" class="nav-item">
+                    <span class="icon">🎯</span>
+                    <span>Servicios</span>
+                </a>
+                <a href="clientes.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span>Clientes</span>
+                </a>
+                <a href="correos.html" class="nav-item" id="navCorreos">
+                    <span class="icon">📧</span>
+                    <span>Correos</span>
+                </a>
+                <a href="cuentas.html" class="nav-item active">
+                    <span class="icon">🔐</span>
+                    <span>Cuentas</span>
+                </a>
+                <a href="movimientos.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span>Movimientos</span>
+                </a>
+                <a href="alertas.html" class="nav-item">
+                    <span class="icon">⚠️</span>
+                    <span>Alertas</span>
+                    <span class="badge" id="alertBadge"></span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary btn-block" onclick="Auth.logout()">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>Cuentas</h2>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" id="btnNuevaCuenta" onclick="openModalCuenta()">
+                        ➕ Nueva Cuenta
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchCuenta" placeholder="🔍 Buscar cuenta..." class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterServicio" class="form-control">
+                            <option value="">Todos los servicios</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterEstado" class="form-control">
+                            <option value="activa">Activas</option>
+                            <option value="inactiva">Inactivas</option>
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Cuentas Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="cuentasTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Servicio</th>
+                                        <th>Usuario</th>
+                                        <th>Correo</th>
+                                        <th>Perfiles</th>
+                                        <th>Fecha Creación</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Se carga dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Crear/Editar Cuenta -->
+    <div class="modal-overlay" id="modalCuenta">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalCuentaTitle">Nueva Cuenta</h3>
+                <button class="modal-close" onclick="closeModalCuenta()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="formCuenta">
+                    <input type="hidden" id="cuentaId">
+                    
+                    <div class="form-group required">
+                        <label for="cuentaServicio">Servicio</label>
+                        <select id="cuentaServicio" required>
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group required">
+                        <label for="cuentaUsuario">Usuario / Login</label>
+                        <input type="text" id="cuentaUsuario" required>
+                    </div>
+
+                    <div class="form-group required">
+                        <label for="cuentaPassword">Contraseña</label>
+                        <input type="text" id="cuentaPassword" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cuentaCorreo">Correo Asociado</label>
+                        <select id="cuentaCorreo">
+                            <option value="">Ninguno</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cuentaNotas">Notas</label>
+                        <textarea id="cuentaNotas"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalCuenta()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarCuenta()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Perfiles -->
+    <div class="modal-overlay" id="modalPerfiles">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalPerfilesTitle">Perfiles de Cuenta</h3>
+                <button class="modal-close" onclick="closeModalPerfiles()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="perfilesContent">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalPerfiles()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Asignar/Renovar/Editar Perfil -->
+    <div class="modal-overlay" id="modalAccionPerfil">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalAccionPerfilTitle">Acción Perfil</h3>
+                <button class="modal-close" onclick="closeModalAccionPerfil()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="formAccionPerfil">
+                    <input type="hidden" id="accionPerfilId">
+                    <input type="hidden" id="accionTipo">
+                    
+                    <div id="formAsignar" style="display: none;">
+                        <div class="form-group required">
+                            <label for="asignarCliente">Cliente</label>
+                            <select id="asignarCliente" required>
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                        <div class="form-group required">
+                            <label for="asignarPrecio">Precio</label>
+                            <input type="number" id="asignarPrecio" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="asignarDuracion">Duración (días)</label>
+                            <input type="number" id="asignarDuracion" min="1" required>
+                        </div>
+                    </div>
+
+                    <div id="formRenovar" style="display: none;">
+                        <div class="form-group required">
+                            <label for="renovarPrecio">Precio Renovación</label>
+                            <input type="number" id="renovarPrecio" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="renovarDias">Días Adicionales</label>
+                            <input type="number" id="renovarDias" min="1" required>
+                        </div>
+                    </div>
+
+                    <div id="formEditar" style="display: none;">
+                        <div class="form-group">
+                            <label for="editarNombre">Nombre del Perfil</label>
+                            <input type="text" id="editarNombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="editarPin">PIN</label>
+                            <input type="text" id="editarPin">
+                        </div>
+                        <div class="form-group">
+                            <label for="editarFechaInicio">Fecha Inicio</label>
+                            <input type="date" id="editarFechaInicio">
+                        </div>
+                        <div class="form-group">
+                            <label for="editarFechaFin">Fecha Fin</label>
+                            <input type="date" id="editarFechaFin">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalAccionPerfil()">Cancelar</button>
+                <button class="btn btn-primary" onclick="ejecutarAccionPerfil()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/sheetsClient.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/cuentas.js"></script>
+</body>
+</html>

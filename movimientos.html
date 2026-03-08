@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimientos - Streaming Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎬 Streaming Manager</h1>
+                <div class="user-info">
+                    <span id="userDisplay"></span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="servicios.html" class="nav-item">
+                    <span class="icon">🎯</span>
+                    <span>Servicios</span>
+                </a>
+                <a href="clientes.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span>Clientes</span>
+                </a>
+                <a href="correos.html" class="nav-item" id="navCorreos">
+                    <span class="icon">📧</span>
+                    <span>Correos</span>
+                </a>
+                <a href="cuentas.html" class="nav-item">
+                    <span class="icon">🔐</span>
+                    <span>Cuentas</span>
+                </a>
+                <a href="movimientos.html" class="nav-item active">
+                    <span class="icon">💰</span>
+                    <span>Movimientos</span>
+                </a>
+                <a href="alertas.html" class="nav-item">
+                    <span class="icon">⚠️</span>
+                    <span>Alertas</span>
+                    <span class="badge" id="alertBadge"></span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary btn-block" onclick="Auth.logout()">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>Movimientos</h2>
+                <div class="topbar-actions">
+                    <button class="btn btn-success" onclick="openModalMovimiento('entrada')">
+                        ➕ Nueva Entrada
+                    </button>
+                    <button class="btn btn-danger" onclick="openModalMovimiento('salida')">
+                        ➖ Nueva Salida
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Stats -->
+                <div class="stats-grid" id="statsMovimientos">
+                    <!-- Se carga dinámicamente -->
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchMovimiento" placeholder="🔍 Buscar..." class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterTipo" class="form-control">
+                            <option value="">Todos los tipos</option>
+                            <option value="entrada">Entradas</option>
+                            <option value="salida">Salidas</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterCategoria" class="form-control">
+                            <option value="">Todas las categorías</option>
+                            <option value="venta">Venta</option>
+                            <option value="renovacion">Renovación</option>
+                            <option value="compra_cuenta">Compra de Cuenta</option>
+                            <option value="gasto_operativo">Gasto Operativo</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <input type="date" id="filterFechaDesde" class="form-control" placeholder="Desde">
+                    </div>
+                    <div class="filter-group">
+                        <input type="date" id="filterFechaHasta" class="form-control" placeholder="Hasta">
+                    </div>
+                </div>
+
+                <!-- Movimientos Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="movimientosTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Categoría</th>
+                                        <th>Cliente</th>
+                                        <th>Servicio</th>
+                                        <th>Monto</th>
+                                        <th>Usuario</th>
+                                        <th>Notas</th>
+                                        <th id="thAccionesMovimientos">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Se carga dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Crear Movimiento -->
+    <div class="modal-overlay" id="modalMovimiento">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalMovimientoTitle">Nuevo Movimiento</h3>
+                <button class="modal-close" onclick="closeModalMovimiento()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="formMovimiento">
+                    <input type="hidden" id="movimientoTipo">
+                    
+                    <div class="form-group required">
+                        <label for="movimientoCategoria">Categoría</label>
+                        <select id="movimientoCategoria" required>
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group required">
+                        <label for="movimientoMonto">Monto</label>
+                        <input type="number" id="movimientoMonto" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="movimientoCliente">Cliente</label>
+                        <select id="movimientoCliente">
+                            <option value="">Ninguno</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="movimientoServicio">Servicio</label>
+                        <select id="movimientoServicio">
+                            <option value="">Ninguno</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="movimientoMetodoPago">Método de Pago</label>
+                        <select id="movimientoMetodoPago">
+                            <option value="efectivo">Efectivo</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group required">
+                        <label for="movimientoFecha">Fecha</label>
+                        <input type="date" id="movimientoFecha" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="movimientoNotas">Notas</label>
+                        <textarea id="movimientoNotas"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalMovimiento()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarMovimiento()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/sheetsClient.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/movimientos.js"></script>
+</body>
+</html>

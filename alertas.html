@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alertas - Streaming Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎬 Streaming Manager</h1>
+                <div class="user-info">
+                    <span id="userDisplay"></span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="servicios.html" class="nav-item">
+                    <span class="icon">🎯</span>
+                    <span>Servicios</span>
+                </a>
+                <a href="clientes.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span>Clientes</span>
+                </a>
+                <a href="correos.html" class="nav-item" id="navCorreos">
+                    <span class="icon">📧</span>
+                    <span>Correos</span>
+                </a>
+                <a href="cuentas.html" class="nav-item">
+                    <span class="icon">🔐</span>
+                    <span>Cuentas</span>
+                </a>
+                <a href="movimientos.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span>Movimientos</span>
+                </a>
+                <a href="alertas.html" class="nav-item active">
+                    <span class="icon">⚠️</span>
+                    <span>Alertas</span>
+                    <span class="badge" id="alertBadge"></span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary btn-block" onclick="Auth.logout()">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>⚠️ Alertas de Vencimiento</h2>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="loadAlertas()">
+                        🔄 Refrescar
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Info Banner -->
+                <div class="card mb-3" style="background: rgba(245, 158, 11, 0.1); border-color: var(--warning-color);">
+                    <div class="card-body">
+                        <p style="margin: 0; color: var(--warning-color);">
+                            ⚠️ Estas son las suscripciones que vencen en los próximos <strong id="diasAlerta"></strong> días. 
+                            Contacta a los clientes para renovar.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchAlerta" placeholder="🔍 Buscar cliente o servicio..." class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterServicio" class="form-control">
+                            <option value="">Todos los servicios</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterUrgencia" class="form-control">
+                            <option value="">Todas las urgencias</option>
+                            <option value="critico">Crítico (≤3 días)</option>
+                            <option value="urgente">Urgente (4-7 días)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Alertas Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="alertasTable">
+                                <thead>
+                                    <tr>
+                                        <th>Urgencia</th>
+                                        <th>Cliente</th>
+                                        <th>Servicio</th>
+                                        <th>Perfil</th>
+                                        <th>Fecha Vencimiento</th>
+                                        <th>Días Restantes</th>
+                                        <th>Precio</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Se carga dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="icon">✅</div>
+                    <h3>¡Todo al día!</h3>
+                    <p>No hay suscripciones próximas a vencer</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Renovar -->
+    <div class="modal-overlay" id="modalRenovar">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Renovar Suscripción</h3>
+                <button class="modal-close" onclick="closeModalRenovar()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="renovarInfo" class="mb-3">
+                    <!-- Información del perfil a renovar -->
+                </div>
+                <form id="formRenovar">
+                    <input type="hidden" id="renovarPerfilId">
+                    <input type="hidden" id="renovarClienteId">
+                    <input type="hidden" id="renovarServicioId">
+                    
+                    <div class="form-group required">
+                        <label for="renovarPrecio">Precio Renovación</label>
+                        <input type="number" id="renovarPrecio" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group required">
+                        <label for="renovarDias">Días Adicionales</label>
+                        <input type="number" id="renovarDias" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="renovarNotas">Notas</label>
+                        <textarea id="renovarNotas"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalRenovar()">Cancelar</button>
+                <button class="btn btn-success" onclick="ejecutarRenovacion()">Renovar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/sheetsClient.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/alertas.js"></script>
+</body>
+</html>

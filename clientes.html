@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Streaming Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎬 Streaming Manager</h1>
+                <div class="user-info">
+                    <span id="userDisplay"></span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="servicios.html" class="nav-item">
+                    <span class="icon">🎯</span>
+                    <span>Servicios</span>
+                </a>
+                <a href="clientes.html" class="nav-item active">
+                    <span class="icon">👥</span>
+                    <span>Clientes</span>
+                </a>
+                <a href="correos.html" class="nav-item" id="navCorreos">
+                    <span class="icon">📧</span>
+                    <span>Correos</span>
+                </a>
+                <a href="cuentas.html" class="nav-item">
+                    <span class="icon">🔐</span>
+                    <span>Cuentas</span>
+                </a>
+                <a href="movimientos.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span>Movimientos</span>
+                </a>
+                <a href="alertas.html" class="nav-item">
+                    <span class="icon">⚠️</span>
+                    <span>Alertas</span>
+                    <span class="badge" id="alertBadge"></span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary btn-block" onclick="Auth.logout()">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>Clientes</h2>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModalCliente()">
+                        ➕ Nuevo Cliente
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchCliente" placeholder="🔍 Buscar cliente..." class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterEstado" class="form-control">
+                            <option value="activo">Activos</option>
+                            <option value="inactivo">Inactivos</option>
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Clientes Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="clientesTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Teléfono</th>
+                                        <th>Email</th>
+                                        <th>Fecha Registro</th>
+                                        <th>Suscripciones Activas</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Se carga dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Crear/Editar Cliente -->
+    <div class="modal-overlay" id="modalCliente">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalClienteTitle">Nuevo Cliente</h3>
+                <button class="modal-close" onclick="closeModalCliente()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="formCliente">
+                    <input type="hidden" id="clienteId">
+                    
+                    <div class="form-group required">
+                        <label for="clienteNombre">Nombre Completo</label>
+                        <input type="text" id="clienteNombre" required>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group required">
+                            <label for="clienteTelefono">Teléfono</label>
+                            <input type="tel" id="clienteTelefono" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clienteEmail">Email</label>
+                            <input type="email" id="clienteEmail">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="clienteDireccion">Dirección</label>
+                        <textarea id="clienteDireccion"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="clienteNotas">Notas</label>
+                        <textarea id="clienteNotas"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalCliente()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarCliente()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalle Cliente -->
+    <div class="modal-overlay" id="modalDetalleCliente">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="detalleClienteNombre">Detalle Cliente</h3>
+                <button class="modal-close" onclick="closeModalDetalleCliente()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="detalleClienteContent">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalDetalleCliente()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/sheetsClient.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/clientes.js"></script>
+</body>
+</html>

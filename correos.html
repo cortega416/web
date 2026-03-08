@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correos - Streaming Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎬 Streaming Manager</h1>
+                <div class="user-info">
+                    <span id="userDisplay"></span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="servicios.html" class="nav-item">
+                    <span class="icon">🎯</span>
+                    <span>Servicios</span>
+                </a>
+                <a href="clientes.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    <span>Clientes</span>
+                </a>
+                <a href="correos.html" class="nav-item active">
+                    <span class="icon">📧</span>
+                    <span>Correos</span>
+                </a>
+                <a href="cuentas.html" class="nav-item">
+                    <span class="icon">🔐</span>
+                    <span>Cuentas</span>
+                </a>
+                <a href="movimientos.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    <span>Movimientos</span>
+                </a>
+                <a href="alertas.html" class="nav-item">
+                    <span class="icon">⚠️</span>
+                    <span>Alertas</span>
+                    <span class="badge" id="alertBadge"></span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary btn-block" onclick="Auth.logout()">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <h2>Correos</h2>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModalCorreo()">
+                        ➕ Nuevo Correo
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchCorreo" placeholder="🔍 Buscar correo..." class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <select id="filterEstado" class="form-control">
+                            <option value="activo">Activos</option>
+                            <option value="inactivo">Inactivos</option>
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Correos Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="correosTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Email</th>
+                                        <th>Contraseña</th>
+                                        <th>Tipo</th>
+                                        <th>Cuentas Asociadas</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Se carga dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Crear/Editar Correo -->
+    <div class="modal-overlay" id="modalCorreo">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalCorreoTitle">Nuevo Correo</h3>
+                <button class="modal-close" onclick="closeModalCorreo()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="formCorreo">
+                    <input type="hidden" id="correoId">
+                    
+                    <div class="form-group required">
+                        <label for="correoEmail">Email</label>
+                        <input type="email" id="correoEmail" required>
+                    </div>
+
+                    <div class="form-group required">
+                        <label for="correoPassword">Contraseña</label>
+                        <input type="text" id="correoPassword" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="correoTipo">Tipo</label>
+                        <select id="correoTipo">
+                            <option value="principal">Principal</option>
+                            <option value="secundario">Secundario</option>
+                            <option value="temporal">Temporal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="correoRecuperacion">Email de Recuperación</label>
+                        <input type="email" id="correoRecuperacion">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="correoNotas">Notas</label>
+                        <textarea id="correoNotas"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModalCorreo()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarCorreo()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/sheetsClient.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/correos.js"></script>
+</body>
+</html>
