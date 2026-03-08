@@ -1518,3 +1518,106 @@ tr:hover {
         display: block;
     }
 }
+
+/* ============ MEJORAS PARA TABLAS EN MÓVIL ============ */
+@media (max-width: 768px) {
+    /* Hacer que las tablas sean más compactas */
+    table {
+        min-width: 100%;
+        font-size: 12px;
+    }
+    
+    th {
+        padding: 8px 6px;
+        font-size: 10px;
+    }
+    
+    td {
+        padding: 10px 6px;
+        font-size: 12px;
+        word-wrap: break-word;
+    }
+    
+    /* Ocultar columnas en móvil con clase hide-mobile */
+    .hide-mobile {
+        display: none !important;
+    }
+    
+    /* Mostrar solo en móvil */
+    .show-mobile {
+        display: block !important;
+    }
+    
+    /* Ajustar ancho de botones en tabla */
+    .table-actions {
+        min-width: 100px;
+    }
+    
+    .table-actions .btn-sm {
+        padding: 6px 8px;
+        min-width: 32px;
+        font-size: 12px;
+    }
+    
+    /* Topbar actions más compacto */
+    .topbar-actions .hide-mobile {
+        display: none;
+    }
+    
+    /* Cards más compactos */
+    .card-header {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .card-header .btn {
+        width: auto;
+        margin-top: 0;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Tablas ultra compactas */
+    table {
+        font-size: 11px;
+    }
+    
+    th {
+        padding: 6px 4px;
+        font-size: 9px;
+    }
+    
+    td {
+        padding: 8px 4px;
+        font-size: 11px;
+    }
+    
+    .table-actions .btn-sm {
+        padding: 4px 6px;
+        min-width: 28px;
+        font-size: 11px;
+    }
+    
+    /* Badges más pequeños */
+    .badge {
+        padding: 2px 6px;
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 375px) {
+    table {
+        font-size: 10px;
+    }
+    
+    th, td {
+        padding: 6px 3px;
+    }
+    
+    .table-actions .btn-sm {
+        padding: 4px;
+        min-width: 24px;
+    }
+}

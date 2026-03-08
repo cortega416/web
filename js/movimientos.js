@@ -368,3 +368,78 @@ async function eliminarMovimiento(id) {
         loadingOverlay.classList.remove('active');
     }
 }
+
+// Renderizar tabla de movimientos - OPTIMIZADA PARA MÓVIL
+function renderMovimientos(data) {
+    const tbody = document.querySelector('#movimientosTable tbody');
+    const isAdmin = Auth.isAdmin();
+    
+    if (data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="10" class="text-center text-muted">No hay movimientos registrados</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    const sorted = [...data].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    tbody.innerHTML = sorted.map(mov => {
+        const esEliminado = mov.monto == 0 && mov.notas && mov.notas.includes('[ELIMINADO]');
+        
+        const cliente = clientes.find(c => c.id == mov.cliente_id);
+        const servicio = servicios.find(s => s.id == mov.servicio_id);
+        const usuario = usuarios.find(u => u.id == mov.usuario_id);
+        
+        const tipoBadge = mov.tipo === 'entrada' 
+            ? '<span class="badge badge-success">Entrada</span>'
+            : '<span class="badge badge-danger">Salida</span>';
+        
+        const categoriaBadge = `<span class="badge badge-secondary" style="font-size: 9px;">${mov.categoria}</span>`;
+        
+        const clienteNombre = cliente ? 
+            (cliente.nombre.length > 20 ? cliente.nombre.substring(0, 20) + '...' : cliente.nombre) 
+            : '-';
+        
+        return `
+            <tr ${esEliminado ? 'style="opacity: 0.5; text-decoration: line-through;"' : ''}>
+                <td class="hide-mobile">${mov.id}</td>
+                <td style="white-space: nowrap; font-size: 11px;">${Utils.formatDate(mov.fecha)}</td>
+                <td>
+                    ${tipoBadge}
+                    <div class="show-mobile" style="margin-top: 4px;">
+                        ${categoriaBadge}
+                    </div>
+                </td>
+                <td class="hide-mobile">${categoriaBadge}</td>
+                <td style="font-size: 11px;">
+                    <div style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">
+                        ${clienteNombre}
+                    </div>
+                </td>
+                <td class="hide-mobile" style="font-size: 11px;">
+                    <div style="max-width: 100px; overflow: hidden; text-overflow: ellipsis;">
+                        ${servicio ? servicio.nombre : '-'}
+                    </div>
+                </td>
+                <td class="${mov.tipo === 'entrada' ? 'text-success' : 'text-danger'}" style="white-space: nowrap;">
+                    <strong style="font-size: 12px;">
+                        ${mov.tipo === 'entrada' ? '+' : '-'}${Utils.formatCurrency(mov.monto)}
+                    </strong>
+                </td>
+                <td class="hide-mobile" style="font-size: 11px;">${usuario ? usuario.usuario : '-'}</td>
+                <td class="hide-mobile" style="font-size: 10px; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${mov.notas || '-'}</td>
+                ${isAdmin ? `
+                    <td>
+                        <div class="table-actions">
+                            ${!esEliminado ? `
+                                <button class="btn btn-sm btn-danger" onclick="eliminarMovimiento(${mov.id})">🗑️</button>
+                            ` : ''}
+                        </div>
+                    </td>
+                ` : ''}
+            </tr>
+        `;
+    }).join('');
+}

@@ -336,3 +336,65 @@ async function liberarPerfilAlerta(perfilId) {
         loadingOverlay.classList.remove('active');
     }
 }
+
+// Renderizar tabla de alertas - OPTIMIZADA PARA MÓVIL
+function renderAlertas(data) {
+    const tbody = document.querySelector('#alertasTable tbody');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    tbody.innerHTML = data.map(alerta => {
+        const urgenciaBadge = alerta.urgencia === 'critico'
+            ? '<span class="badge badge-danger">⚠️ CRÍTICO</span>'
+            : '<span class="badge badge-warning">⏰ Urgente</span>';
+        
+        const clienteNombre = alerta.cliente ? 
+            (alerta.cliente.nombre.length > 20 ? alerta.cliente.nombre.substring(0, 20) + '...' : alerta.cliente.nombre) 
+            : 'N/A';
+        
+        return `
+            <tr>
+                <td>${urgenciaBadge}</td>
+                <td>
+                    <strong style="font-size: 12px;">${clienteNombre}</strong>
+                    <div class="show-mobile text-muted" style="font-size: 10px; margin-top: 4px;">
+                        ${alerta.servicio ? alerta.servicio.nombre : 'N/A'}
+                    </div>
+                </td>
+                <td class="hide-mobile" style="font-size: 11px;">${alerta.servicio ? alerta.servicio.nombre : 'N/A'}</td>
+                <td class="hide-mobile" style="font-size: 11px;">Perfil #${alerta.perfil.numero}</td>
+                <td style="white-space: nowrap; font-size: 11px;">
+                    ${Utils.formatDate(alerta.perfil.fecha_fin)}
+                    <div class="show-mobile">
+                        <span class="badge badge-${alerta.urgencia === 'critico' ? 'danger' : 'warning'}" style="font-size: 9px; margin-top: 4px;">
+                            ${alerta.daysRemaining} día${alerta.daysRemaining !== 1 ? 's' : ''}
+                        </span>
+                    </div>
+                </td>
+                <td class="hide-mobile">
+                    <span class="badge badge-${alerta.urgencia === 'critico' ? 'danger' : 'warning'}">
+                        ${alerta.daysRemaining} día${alerta.daysRemaining !== 1 ? 's' : ''}
+                    </span>
+                </td>
+                <td class="hide-mobile" style="white-space: nowrap;">${alerta.suscripcion ? Utils.formatCurrency(alerta.suscripcion.precio) : '-'}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})">
+                            Renovar
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})">
+                            Liberar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}

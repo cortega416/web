@@ -239,3 +239,58 @@ function renderAlertasPreview() {
         `;
     }).join('');
 }
+
+// Renderizar actividad reciente - OPTIMIZADA PARA MÓVIL
+function renderRecentActivity() {
+    const tbody = document.querySelector('#recentActivityTable tbody');
+    
+    // Tomar los últimos 10 movimientos
+    const movimientosRecientes = cachedData.movimientos
+        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+        .slice(0, 10);
+    
+    if (movimientosRecientes.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-muted">No hay movimientos registrados</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = movimientosRecientes.map(mov => {
+        const cliente = cachedData.clientes.find(c => c.id == mov.cliente_id);
+        const servicio = cachedData.servicios.find(s => s.id == mov.servicio_id);
+        
+        const tipoBadge = mov.tipo === 'entrada' 
+            ? '<span class="badge badge-success">Entrada</span>'
+            : '<span class="badge badge-danger">Salida</span>';
+        
+        // Nombre de cliente truncado para móvil
+        const clienteNombre = cliente ? 
+            (cliente.nombre.length > 20 ? cliente.nombre.substring(0, 20) + '...' : cliente.nombre) 
+            : '-';
+        
+        return `
+            <tr>
+                <td style="white-space: nowrap;">
+                    ${Utils.formatDate(mov.fecha)}
+                </td>
+                <td>${tipoBadge}</td>
+                <td>
+                    <div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">
+                        ${clienteNombre}
+                    </div>
+                </td>
+                <td class="hide-mobile">
+                    <div style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">
+                        ${servicio ? servicio.nombre : '-'}
+                    </div>
+                </td>
+                <td class="${mov.tipo === 'entrada' ? 'text-success' : 'text-danger'}" style="white-space: nowrap;">
+                    <strong>${mov.tipo === 'entrada' ? '+' : '-'}${Utils.formatCurrency(mov.monto)}</strong>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}

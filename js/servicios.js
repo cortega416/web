@@ -254,3 +254,63 @@ async function toggleEstadoServicio(id) {
         loadingOverlay.classList.remove('active');
     }
 }
+
+// Renderizar tabla de servicios - OPTIMIZADA PARA MÓVIL
+function renderServicios(data) {
+    const tbody = document.querySelector('#serviciosTable tbody');
+    const isAdmin = Auth.isAdmin();
+    
+    if (data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="${isAdmin ? 9 : 7}" class="text-center text-muted">No hay servicios registrados</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = data.map(servicio => {
+        const estadoBadge = servicio.estado === 'activo' 
+            ? '<span class="badge badge-success">Activo</span>'
+            : '<span class="badge badge-secondary">Inactivo</span>';
+        
+        const tipoBadge = `<span class="badge badge-primary">${servicio.tipo}</span>`;
+        
+        let html = `
+            <tr>
+                <td class="hide-mobile">${servicio.id}</td>
+                <td>
+                    <strong>${servicio.nombre}</strong>
+                    <div class="show-mobile text-muted" style="font-size: 11px; margin-top: 4px;">
+                        ${tipoBadge} ${estadoBadge}
+                    </div>
+                </td>
+                <td class="hide-mobile">${tipoBadge}</td>
+                <td style="white-space: nowrap;">${Utils.formatCurrency(servicio.precio_venta)}</td>
+                <td class="hide-mobile">${servicio.duracion_dias} días</td>
+                <td>${servicio.perfiles_max}</td>
+        `;
+        
+        if (isAdmin) {
+            html += `<td class="hide-mobile">${Utils.formatCurrency(servicio.costo_base)}</td>`;
+        }
+        
+        html += `<td class="hide-mobile">${estadoBadge}</td>`;
+        
+        if (isAdmin) {
+            html += `
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="editServicio(${servicio.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoServicio(${servicio.id})">
+                            ${servicio.estado === 'activo' ? '🗑️' : '♻️'}
+                        </button>
+                    </div>
+                </td>
+            `;
+        }
+        
+        html += `</tr>`;
+        return html;
+    }).join('');
+}

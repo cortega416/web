@@ -306,3 +306,60 @@ async function verDetalleCliente(id) {
 function closeModalDetalleCliente() {
     document.getElementById('modalDetalleCliente').classList.remove('active');
 }
+
+// Renderizar tabla de clientes - OPTIMIZADA PARA MÓVIL
+function renderClientes(data) {
+    const tbody = document.querySelector('#clientesTable tbody');
+    
+    if (data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center text-muted">No hay clientes registrados</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = data.map(cliente => {
+        const suscripcionesActivas = suscripciones.filter(s => 
+            s.cliente_id == cliente.id && s.estado === 'activa'
+        ).length;
+        
+        const estadoBadge = cliente.estado === 'activo' 
+            ? '<span class="badge badge-success">Activo</span>'
+            : '<span class="badge badge-secondary">Inactivo</span>';
+        
+        // Truncar nombre para móvil
+        const nombreDisplay = cliente.nombre.length > 25 
+            ? cliente.nombre.substring(0, 25) + '...' 
+            : cliente.nombre;
+        
+        return `
+            <tr>
+                <td class="hide-mobile">${cliente.id}</td>
+                <td>
+                    <strong>${nombreDisplay}</strong>
+                    <div class="show-mobile text-muted" style="font-size: 11px; margin-top: 4px;">
+                        ${estadoBadge}
+                    </div>
+                </td>
+                <td style="word-break: break-all;">${cliente.telefono || '-'}</td>
+                <td class="hide-mobile" style="word-break: break-all; font-size: 11px;">${cliente.email || '-'}</td>
+                <td class="hide-mobile">${Utils.formatDate(cliente.fecha_registro)}</td>
+                <td>
+                    <span class="badge badge-primary">${suscripcionesActivas}</span>
+                </td>
+                <td class="hide-mobile">${estadoBadge}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="verDetalleCliente(${cliente.id})" title="Ver">👁️</button>
+                        <button class="btn btn-sm btn-secondary" onclick="editCliente(${cliente.id})" title="Editar">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoCliente(${cliente.id})" title="${cliente.estado === 'activo' ? 'Desactivar' : 'Activar'}">
+                            ${cliente.estado === 'activo' ? '🗑️' : '♻️'}
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}

@@ -789,3 +789,78 @@ async function ejecutarEdicion(perfilId) {
         loadingOverlay.classList.remove('active');
     }
 }
+
+// Renderizar tabla de cuentas - OPTIMIZADA PARA MÓVIL
+function renderCuentas(data) {
+    const tbody = document.querySelector('#cuentasTable tbody');
+    
+    if (data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-muted">No hay cuentas registradas</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = data.map(cuenta => {
+        const servicio = servicios.find(s => s.id == cuenta.servicio_id);
+        const correo = correos.find(c => c.id == cuenta.correo_id);
+        
+        // Contar perfiles
+        const perfilesCuenta = perfiles.filter(p => p.cuenta_id == cuenta.id);
+        const perfilesOcupados = perfilesCuenta.filter(p => p.estado === 'ocupado').length;
+        const perfilesTotal = perfilesCuenta.length;
+        
+        const estadoBadge = cuenta.estado === 'activa' 
+            ? '<span class="badge badge-success">Activa</span>'
+            : '<span class="badge badge-secondary">Inactiva</span>';
+        
+        // Usuario truncado para móvil
+        const usuarioDisplay = cuenta.usuario.length > 15 
+            ? cuenta.usuario.substring(0, 15) + '...' 
+            : cuenta.usuario;
+        
+        return `
+            <tr>
+                <td>
+                    <strong>${servicio ? servicio.nombre : 'N/A'}</strong>
+                    <div class="show-mobile text-muted" style="font-size: 11px; margin-top: 4px;">
+                        ${estadoBadge}
+                    </div>
+                </td>
+                <td>
+                    <div style="word-break: break-all; max-width: 150px;">
+                        ${usuarioDisplay}
+                    </div>
+                </td>
+                <td class="hide-mobile">
+                    <div style="word-break: break-all; font-size: 12px;">
+                        ${correo ? correo.email : '-'}
+                    </div>
+                </td>
+                <td>
+                    <span class="badge ${perfilesOcupados === perfilesTotal ? 'badge-danger' : 'badge-success'}">
+                        ${perfilesOcupados}/${perfilesTotal}
+                    </span>
+                </td>
+                <td class="hide-mobile">${estadoBadge}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-primary" onclick="verPerfiles(${cuenta.id})" title="Ver Perfiles">
+                            👁️
+                        </button>
+                        ${Auth.isAdmin() ? `
+                            <button class="btn btn-sm btn-secondary" onclick="editCuenta(${cuenta.id})" title="Editar">
+                                ✏️
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="toggleEstadoCuenta(${cuenta.id})" title="${cuenta.estado === 'activa' ? 'Desactivar' : 'Activar'}">
+                                ${cuenta.estado === 'activa' ? '🗑️' : '♻️'}
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}

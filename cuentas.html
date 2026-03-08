@@ -59,11 +59,11 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="topbar">
-                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Menú">☰</button>
+                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
                 <h2>Cuentas</h2>
                 <div class="topbar-actions">
-                    <button class="btn btn-primary" id="btnNuevaCuenta" onclick="openModalCuenta()">
-                        ➕ Nueva Cuenta
+                    <button class="btn btn-primary btn-sm" id="btnNuevaCuenta" onclick="openModalCuenta()">
+                        ➕ <span class="hide-mobile">Nueva</span>
                     </button>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                 <!-- Filters -->
                 <div class="filters">
                     <div class="filter-group">
-                        <input type="text" id="searchCuenta" placeholder="🔍 Buscar cuenta..." class="form-control">
+                        <input type="text" id="searchCuenta" placeholder="🔍 Buscar..." class="form-control">
                     </div>
                     <div class="filter-group">
                         <select id="filterServicio" class="form-control">
@@ -95,13 +95,11 @@
                             <table id="cuentasTable">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Servicio</th>
                                         <th>Usuario</th>
-                                        <th>Correo</th>
+                                        <th class="hide-mobile">Correo</th>
                                         <th>Perfiles</th>
-                                        <th>Fecha Creación</th>
-                                        <th>Estado</th>
+                                        <th class="hide-mobile">Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -205,7 +203,7 @@
                             <label for="asignarPrecio">Precio</label>
                             <input type="number" id="asignarPrecio" step="0.01" min="0" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="asignarDuracion">Duración (días)</label>
                             <input type="number" id="asignarDuracion" min="1" required>
                         </div>
@@ -216,7 +214,7 @@
                             <label for="renovarPrecio">Precio Renovación</label>
                             <input type="number" id="renovarPrecio" step="0.01" min="0" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="renovarDias">Días Adicionales</label>
                             <input type="number" id="renovarDias" min="1" required>
                         </div>
@@ -249,17 +247,16 @@
         </div>
     </div>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 
     <script src="js/config.js"></script>
     <script src="js/sheetsClient.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/cuentas.js"></script>
     <script src="js/mobile.js"></script>
+    <script src="js/cuentas.js"></script>
 </body>
 </html>

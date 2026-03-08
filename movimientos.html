@@ -59,14 +59,14 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="topbar">
-                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Menú">☰</button>
+                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
                 <h2>Movimientos</h2>
                 <div class="topbar-actions">
-                    <button class="btn btn-success" onclick="openModalMovimiento('entrada')">
-                        ➕ Nueva Entrada
+                    <button class="btn btn-success btn-sm" onclick="openModalMovimiento('entrada')">
+                        ➕ <span class="hide-mobile">Entrada</span>
                     </button>
-                    <button class="btn btn-danger" onclick="openModalMovimiento('salida')">
-                        ➖ Nueva Salida
+                    <button class="btn btn-danger btn-sm" onclick="openModalMovimiento('salida')">
+                        ➖ <span class="hide-mobile">Salida</span>
                     </button>
                 </div>
             </div>
@@ -84,18 +84,18 @@
                     </div>
                     <div class="filter-group">
                         <select id="filterTipo" class="form-control">
-                            <option value="">Todos los tipos</option>
+                            <option value="">Todos</option>
                             <option value="entrada">Entradas</option>
                             <option value="salida">Salidas</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <select id="filterCategoria" class="form-control">
-                            <option value="">Todas las categorías</option>
+                            <option value="">Todas</option>
                             <option value="venta">Venta</option>
                             <option value="renovacion">Renovación</option>
-                            <option value="compra_cuenta">Compra de Cuenta</option>
-                            <option value="gasto_operativo">Gasto Operativo</option>
+                            <option value="compra_cuenta">Compra</option>
+                            <option value="gasto_operativo">Gasto</option>
                             <option value="otro">Otro</option>
                         </select>
                     </div>
@@ -114,15 +114,15 @@
                             <table id="movimientosTable">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th class="hide-mobile">ID</th>
                                         <th>Fecha</th>
                                         <th>Tipo</th>
-                                        <th>Categoría</th>
+                                        <th class="hide-mobile">Categoría</th>
                                         <th>Cliente</th>
-                                        <th>Servicio</th>
+                                        <th class="hide-mobile">Servicio</th>
                                         <th>Monto</th>
-                                        <th>Usuario</th>
-                                        <th>Notas</th>
+                                        <th class="hide-mobile">Usuario</th>
+                                        <th class="hide-mobile">Notas</th>
                                         <th id="thAccionesMovimientos">Acciones</th>
                                     </tr>
                                 </thead>
@@ -202,17 +202,16 @@
         </div>
     </div>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 
     <script src="js/config.js"></script>
     <script src="js/sheetsClient.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/movimientos.js"></script>
     <script src="js/mobile.js"></script>
+    <script src="js/movimientos.js"></script>
 </body>
 </html>

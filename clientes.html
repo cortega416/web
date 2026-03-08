@@ -59,11 +59,11 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="topbar">
-                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Menú">☰</button>
+                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
                 <h2>Clientes</h2>
                 <div class="topbar-actions">
-                    <button class="btn btn-primary" onclick="openModalCliente()">
-                        ➕ Nuevo Cliente
+                    <button class="btn btn-primary btn-sm" onclick="openModalCliente()">
+                        ➕ <span class="hide-mobile">Nuevo</span>
                     </button>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                 <!-- Filters -->
                 <div class="filters">
                     <div class="filter-group">
-                        <input type="text" id="searchCliente" placeholder="🔍 Buscar cliente..." class="form-control">
+                        <input type="text" id="searchCliente" placeholder="🔍 Buscar..." class="form-control">
                     </div>
                     <div class="filter-group">
                         <select id="filterEstado" class="form-control">
@@ -90,13 +90,13 @@
                             <table id="clientesTable">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th class="hide-mobile">ID</th>
                                         <th>Nombre</th>
                                         <th>Teléfono</th>
-                                        <th>Email</th>
-                                        <th>Fecha Registro</th>
-                                        <th>Suscripciones Activas</th>
-                                        <th>Estado</th>
+                                        <th class="hide-mobile">Email</th>
+                                        <th class="hide-mobile">Registro</th>
+                                        <th>Suscr.</th>
+                                        <th class="hide-mobile">Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -175,17 +175,16 @@
         </div>
     </div>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 
     <script src="js/config.js"></script>
     <script src="js/sheetsClient.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/clientes.js"></script>
     <script src="js/mobile.js"></script>
+    <script src="js/clientes.js"></script>
 </body>
 </html>

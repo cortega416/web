@@ -59,11 +59,11 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="topbar">
-                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Menú">☰</button>
+                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
                 <h2>Correos</h2>
                 <div class="topbar-actions">
-                    <button class="btn btn-primary" onclick="openModalCorreo()">
-                        ➕ Nuevo Correo
+                    <button class="btn btn-primary btn-sm" onclick="openModalCorreo()">
+                        ➕ <span class="hide-mobile">Nuevo</span>
                     </button>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                 <!-- Filters -->
                 <div class="filters">
                     <div class="filter-group">
-                        <input type="text" id="searchCorreo" placeholder="🔍 Buscar correo..." class="form-control">
+                        <input type="text" id="searchCorreo" placeholder="🔍 Buscar..." class="form-control">
                     </div>
                     <div class="filter-group">
                         <select id="filterEstado" class="form-control">
@@ -90,12 +90,12 @@
                             <table id="correosTable">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th class="hide-mobile">ID</th>
                                         <th>Email</th>
-                                        <th>Contraseña</th>
-                                        <th>Tipo</th>
-                                        <th>Cuentas Asociadas</th>
-                                        <th>Estado</th>
+                                        <th>Password</th>
+                                        <th class="hide-mobile">Tipo</th>
+                                        <th>Cuentas</th>
+                                        <th class="hide-mobile">Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -158,17 +158,16 @@
         </div>
     </div>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
     </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 
     <script src="js/config.js"></script>
     <script src="js/sheetsClient.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/correos.js"></script>
     <script src="js/mobile.js"></script>
+    <script src="js/correos.js"></script>
 </body>
 </html>

@@ -240,3 +240,67 @@ async function toggleEstadoCorreo(id) {
         loadingOverlay.classList.remove('active');
     }
 }
+
+// Renderizar tabla de correos - OPTIMIZADA PARA MÓVIL
+function renderCorreos(data) {
+    const tbody = document.querySelector('#correosTable tbody');
+    
+    if (data.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-muted">No hay correos registrados</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = data.map(correo => {
+        const cuentasAsociadas = cuentas.filter(c => c.correo_id == correo.id).length;
+        
+        const estadoBadge = correo.estado === 'activo' 
+            ? '<span class="badge badge-success">Activo</span>'
+            : '<span class="badge badge-secondary">Inactivo</span>';
+        
+        const tipoBadge = correo.tipo === 'principal' 
+            ? '<span class="badge badge-primary">Principal</span>'
+            : correo.tipo === 'secundario'
+            ? '<span class="badge badge-info">Secundario</span>'
+            : '<span class="badge badge-warning">Temporal</span>';
+        
+        // Truncar email para móvil
+        const emailDisplay = correo.email.length > 25 
+            ? correo.email.substring(0, 25) + '...' 
+            : correo.email;
+        
+        return `
+            <tr>
+                <td class="hide-mobile">${correo.id}</td>
+                <td style="word-break: break-all; font-size: 12px;">
+                    <strong>${emailDisplay}</strong>
+                    <div class="show-mobile" style="margin-top: 4px;">
+                        ${tipoBadge} ${estadoBadge}
+                    </div>
+                </td>
+                <td style="white-space: nowrap;">
+                    <span style="font-family: monospace; font-size: 11px;">
+                        ${correo.password ? '••••••' : '-'}
+                    </span>
+                    ${correo.password ? `<button class="btn btn-sm btn-secondary" onclick="mostrarPassword('${correo.password}')" title="Ver">👁️</button>` : ''}
+                </td>
+                <td class="hide-mobile">${tipoBadge}</td>
+                <td>
+                    <span class="badge badge-secondary">${cuentasAsociadas}</span>
+                </td>
+                <td class="hide-mobile">${estadoBadge}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="editCorreo(${correo.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoCorreo(${correo.id})">
+                            ${correo.estado === 'activo' ? '🗑️' : '♻️'}
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
