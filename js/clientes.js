@@ -363,3 +363,29 @@ function renderClientes(data) {
         `;
     }).join('');
 }
+
+// Función para hacer tabla responsiva en móvil
+function makeTableResponsive(tableId) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    const rows = table.querySelectorAll('tbody tr');
+    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+    
+    rows.forEach((row, rowIndex) => {
+        const cells = row.querySelectorAll('td');
+        cells.forEach((cell, cellIndex) => {
+            if (headers[cellIndex]) {
+                cell.setAttribute('data-label', headers[cellIndex]);
+            }
+        });
+    });
+}
+
+// Llamar después de renderizar cada tabla
+document.addEventListener('DOMContentLoaded', () => {
+    makeTableResponsive('alertasTable');
+    makeTableResponsive('cuentasTable');
+    makeTableResponsive('clientesTable');
+    // etc...
+});

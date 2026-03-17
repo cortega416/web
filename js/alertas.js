@@ -114,7 +114,7 @@ function populateServiciosFilter() {
     });
 }
 
-// Renderizar tabla de alertas
+// Renderizar tabla de alertas - ACTUALIZADO SOLO WHATSAPP
 function renderAlertas(data) {
     const tbody = document.querySelector('#alertasTable tbody');
     const emptyState = document.getElementById('emptyState');
@@ -132,32 +132,77 @@ function renderAlertas(data) {
             ? '<span class="badge badge-danger">⚠️ CRÍTICO</span>'
             : '<span class="badge badge-warning">⏰ Urgente</span>';
         
+        const clienteNombre = alerta.cliente ? 
+            (alerta.cliente.nombre.length > 20 ? alerta.cliente.nombre.substring(0, 20) + '...' : alerta.cliente.nombre) 
+            : 'N/A';
+        
+        // Verificar si el cliente tiene teléfono para WhatsApp
+        const tieneWhatsApp = alerta.cliente && alerta.cliente.telefono;
+        
         return `
             <tr>
                 <td>${urgenciaBadge}</td>
-                <td><strong>${alerta.cliente ? alerta.cliente.nombre : 'N/A'}</strong></td>
-                <td>${alerta.servicio ? alerta.servicio.nombre : 'N/A'}</td>
-                <td>Perfil #${alerta.perfil.numero}</td>
-                <td>${Utils.formatDate(alerta.perfil.fecha_fin)}</td>
                 <td>
+                    <strong style="font-size: 12px;">${clienteNombre}</strong>
+                    <div class="show-mobile text-muted" style="font-size: 10px; margin-top: 4px;">
+                        ${alerta.servicio ? alerta.servicio.nombre : 'N/A'}
+                    </div>
+                </td>
+                <td class="hide-mobile" style="font-size: 11px;">${alerta.servicio ? alerta.servicio.nombre : 'N/A'}</td>
+                <td class="hide-mobile" style="font-size: 11px;">Perfil #${alerta.perfil.numero}</td>
+                <td style="white-space: nowrap; font-size: 11px;">
+                    ${Utils.formatDate(alerta.perfil.fecha_fin)}
+                    <div class="show-mobile">
+                        <span class="badge badge-${alerta.urgencia === 'critico' ? 'danger' : 'warning'}" style="font-size: 9px; margin-top: 4px;">
+                            ${alerta.daysRemaining} día${alerta.daysRemaining !== 1 ? 's' : ''}
+                        </span>
+                    </div>
+                </td>
+                <td class="hide-mobile">
                     <span class="badge badge-${alerta.urgencia === 'critico' ? 'danger' : 'warning'}">
                         ${alerta.daysRemaining} día${alerta.daysRemaining !== 1 ? 's' : ''}
                     </span>
                 </td>
-                <td>${alerta.suscripcion ? Utils.formatCurrency(alerta.suscripcion.precio) : '-'}</td>
+                <td class="hide-mobile" style="white-space: nowrap;">${alerta.suscripcion ? Utils.formatCurrency(alerta.suscripcion.precio) : '-'}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})">
-                            Renovar
+                        ${tieneWhatsApp ? `
+                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar">
+                                📱
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar">
+                            ✅
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})">
-                            Liberar
+                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar">
+                            🗑️
                         </button>
                     </div>
                 </td>
             </tr>
         `;
     }).join('');
+}
+
+// Función para notificar vencimiento por WhatsApp desde alertas
+function notificarVencimientoWhatsApp(clienteId, perfilId, dias, fechaVenc) {
+    const cliente = clientes.find(c => c.id == clienteId);
+    const perfil = perfiles.find(p => p.id == perfilId);
+    const cuenta = cuentas.find(c => c.id == perfil.cuenta_id);
+    const servicio = servicios.find(s => s.id == cuenta.servicio_id);
+    
+    if (!cliente) {
+        Utils.showNotification('Cliente no encontrado', 'error');
+        return;
+    }
+    
+    if (!cliente.telefono) {
+        Utils.showNotification('El cliente no tiene teléfono registrado', 'warning');
+        return;
+    }
+    
+    const mensaje = notificationSystem.generarMensajeVencimiento(cliente, servicio, dias, fechaVenc);
+    notificationSystem.mostrarModalWhatsApp(cliente, mensaje, '📱 Notificar Vencimiento por WhatsApp');
 }
 
 // Filtrar alertas
@@ -218,7 +263,7 @@ function closeModalRenovar() {
     document.getElementById('modalRenovar').classList.remove('active');
 }
 
-// Ejecutar renovación
+// Ejecutar renovación - ALERTAS CON WHATSAPP
 async function ejecutarRenovacion() {
     const form = document.getElementById('formRenovar');
     
@@ -232,13 +277,14 @@ async function ejecutarRenovacion() {
     const servicioId = document.getElementById('renovarServicioId').value;
     const precio = document.getElementById('renovarPrecio').value;
     const diasAdicionales = document.getElementById('renovarDias').value;
-    const notas = document.getElementById('renovarNotas').value;
     
     const loadingOverlay = document.getElementById('loadingOverlay');
     loadingOverlay.classList.add('active');
     
     try {
         const perfil = perfiles.find(p => p.id == perfilId);
+        const cliente = clientes.find(c => c.id == clienteId);
+        const servicio = servicios.find(s => s.id == servicioId);
         const session = Auth.getSession();
         
         // Calcular nueva fecha de fin
@@ -263,7 +309,6 @@ async function ejecutarRenovacion() {
         
         // 3. Crear movimiento
         const movimientoId = await sheetsClient.getNextId(CONFIG.SHEETS.MOVIMIENTOS);
-        const servicio = servicios.find(s => s.id == servicioId);
         const movimientoRow = [
             movimientoId,
             'entrada',
@@ -274,20 +319,99 @@ async function ejecutarRenovacion() {
             'efectivo',
             Utils.getCurrentDate(),
             session.id,
-            notas || `Renovación ${servicio ? servicio.nombre : ''} - Perfil #${perfil.numero}`
+            `Renovación ${servicio.nombre} - Perfil #${perfil.numero}`
         ];
         await sheetsClient.appendRows(CONFIG.SHEETS.MOVIMIENTOS, [movimientoRow]);
         
-        Utils.showNotification('Suscripción renovada correctamente', 'success');
+        Utils.showNotification('✅ Suscripción renovada correctamente', 'success');
         
+        loadingOverlay.classList.remove('active');
         closeModalRenovar();
+        
+        // Notificar al cliente sobre renovación
+        if (cliente && cliente.telefono) {
+            setTimeout(() => {
+                const mensaje = notificationSystem.generarMensajeRenovacion(
+                    cliente,
+                    servicio,
+                    Utils.formatDate(nuevaFechaFin)
+                );
+                notificationSystem.mostrarModalWhatsApp(cliente, mensaje, '📱 Notificar Renovación por WhatsApp');
+            }, 500);
+        }
+        
         await loadAlertas();
         await Utils.updateAlertBadge();
         
     } catch (error) {
         console.error('Error renovando:', error);
-        Utils.showNotification('Error renovando suscripción', 'error');
-    } finally {
+        Utils.showNotification('❌ Error renovando suscripción: ' + error.message, 'error');
+        loadingOverlay.classList.remove('active');
+    }
+}
+
+// Liberar perfil desde alertas - CON NOTIFICACIÓN
+async function liberarPerfilAlerta(perfilId) {
+    if (!await Utils.confirm('¿Estás seguro de liberar este perfil? Se cancelará la suscripción.')) {
+        return;
+    }
+    
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    loadingOverlay.classList.add('active');
+    
+    try {
+        const perfil = perfiles.find(p => p.id == perfilId);
+        const cliente = clientes.find(c => c.id == perfil.cliente_id);
+        
+        // Actualizar perfil
+        await sheetsClient.updateById(CONFIG.SHEETS.PERFILES, perfilId, {
+            estado: 'disponible',
+            cliente_id: '',
+            fecha_inicio: '',
+            fecha_fin: '',
+            nombre: '',
+            pin: ''
+        });
+        
+        // Cancelar suscripción
+        const suscripcion = suscripciones.find(s => 
+            s.perfil_id == perfilId && s.estado === 'activa'
+        );
+        
+        if (suscripcion) {
+            await sheetsClient.updateById(CONFIG.SHEETS.SUSCRIPCIONES, suscripcion.id, {
+                estado: 'cancelada',
+                fecha_fin: Utils.getCurrentDate()
+            });
+        }
+        
+        Utils.showNotification('✅ Perfil liberado correctamente', 'success');
+        
+        loadingOverlay.classList.remove('active');
+        
+        // Notificar al cliente que se ha liberado
+        if (cliente && cliente.telefono) {
+            setTimeout(() => {
+                const mensaje = `ℹ️ *INFORMACIÓN IMPORTANTE*
+
+Hola ${cliente.nombre} 👋
+
+Tu suscripción ha sido cancelada y el perfil liberado.
+
+Si deseas reactivar tu servicio, por favor contáctanos.
+
+¡Gracias! 🎬
+_Streaming Manager_`;
+                notificationSystem.mostrarModalWhatsApp(cliente, mensaje, '📱 Notificar Cancelación por WhatsApp');
+            }, 500);
+        }
+        
+        await loadAlertas();
+        await Utils.updateAlertBadge();
+        
+    } catch (error) {
+        console.error('Error liberando perfil:', error);
+        Utils.showNotification('❌ Error liberando perfil: ' + error.message, 'error');
         loadingOverlay.classList.remove('active');
     }
 }
@@ -359,18 +483,20 @@ function renderAlertas(data) {
             (alerta.cliente.nombre.length > 20 ? alerta.cliente.nombre.substring(0, 20) + '...' : alerta.cliente.nombre) 
             : 'N/A';
         
+        const tieneWhatsApp = alerta.cliente && alerta.cliente.telefono;
+        
         return `
             <tr>
-                <td>${urgenciaBadge}</td>
-                <td>
+                <td data-label="Urgencia">${urgenciaBadge}</td>
+                <td data-label="Cliente">
                     <strong style="font-size: 12px;">${clienteNombre}</strong>
                     <div class="show-mobile text-muted" style="font-size: 10px; margin-top: 4px;">
                         ${alerta.servicio ? alerta.servicio.nombre : 'N/A'}
                     </div>
                 </td>
-                <td class="hide-mobile" style="font-size: 11px;">${alerta.servicio ? alerta.servicio.nombre : 'N/A'}</td>
-                <td class="hide-mobile" style="font-size: 11px;">Perfil #${alerta.perfil.numero}</td>
-                <td style="white-space: nowrap; font-size: 11px;">
+                <td data-label="Servicio" class="hide-mobile" style="font-size: 11px;">${alerta.servicio ? alerta.servicio.nombre : 'N/A'}</td>
+                <td data-label="Perfil" class="hide-mobile" style="font-size: 11px;">Perfil #${alerta.perfil.numero}</td>
+                <td data-label="Vencimiento" style="white-space: nowrap; font-size: 11px;">
                     ${Utils.formatDate(alerta.perfil.fecha_fin)}
                     <div class="show-mobile">
                         <span class="badge badge-${alerta.urgencia === 'critico' ? 'danger' : 'warning'}" style="font-size: 9px; margin-top: 4px;">
@@ -378,19 +504,24 @@ function renderAlertas(data) {
                         </span>
                     </div>
                 </td>
-                <td class="hide-mobile">
+                <td data-label="Días" class="hide-mobile">
                     <span class="badge badge-${alerta.urgencia === 'critico' ? 'danger' : 'warning'}">
                         ${alerta.daysRemaining} día${alerta.daysRemaining !== 1 ? 's' : ''}
                     </span>
                 </td>
-                <td class="hide-mobile" style="white-space: nowrap;">${alerta.suscripcion ? Utils.formatCurrency(alerta.suscripcion.precio) : '-'}</td>
-                <td>
-                    <div class="table-actions">
-                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})">
-                            Renovar
+                <td data-label="Precio" class="hide-mobile" style="white-space: nowrap;">${alerta.suscripcion ? Utils.formatCurrency(alerta.suscripcion.precio) : '-'}</td>
+                <td data-label="Acciones" class="actions-cell">
+                    <div class="table-actions" style="justify-content: center; gap: 6px;">
+                        ${tieneWhatsApp ? `
+                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar">
+                                📱
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar">
+                            ✅
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})">
-                            Liberar
+                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar">
+                            🗑️
                         </button>
                     </div>
                 </td>

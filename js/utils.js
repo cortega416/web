@@ -36,12 +36,20 @@ class Utils {
     }
 
     // Formatear moneda
-    static formatCurrency(amount) {
-        return new Intl.NumberFormat('es-ES', {
+    static formatCurrency(value) {
+        const num = parseFloat(value) || 0;
+        return new Intl.NumberFormat('es-PE', {
             style: 'currency',
-            currency: 'USD'
-        }).format(amount || 0);
+            currency: 'PEN',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(num);
     }
+
+    static formatPrice(value) {
+    const num = parseFloat(value) || 0;
+    return `S/ ${num.toFixed(2)}`;
+}
 
     // Mostrar notificación
     static showNotification(message, type = 'success') {

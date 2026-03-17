@@ -1,11 +1,9 @@
-// Cliente para interactuar con Google Sheets vía Google Apps Script
+// Cliente para Google Sheets vía Google Apps Script
 class SheetsClient {
     constructor() {
-        // URL del Web App de Google Apps Script (configurar después del deploy)
         this.apiUrl = CONFIG.APPS_SCRIPT_URL;
     }
 
-    // Hacer petición al Apps Script
     async makeRequest(action, params) {
         const requestData = {
             action: action,
@@ -17,7 +15,7 @@ class SheetsClient {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
-                    'Content-Type': 'text/plain' // Apps Script requiere text/plain
+                    'Content-Type': 'text/plain'
                 },
                 body: JSON.stringify(requestData)
             });
@@ -35,13 +33,26 @@ class SheetsClient {
         }
     }
 
-    // Leer datos de una hoja
     async readSheet(sheetName, range = null) {
         try {
+            const cacheKey = `sheet_${sheetName}`;
+            const cached = cacheManager.get(cacheKey);
+            
+            if (cached) {
+                console.log(`📦 Datos de ${sheetName} desde caché`);
+                return cached;
+            }
+
+            console.log(`📥 Cargando ${sheetName} desde Google Sheets...`);
             const values = await this.makeRequest('readSheet', { 
                 sheetName, 
                 range 
             });
+            
+            if (values) {
+                cacheManager.set(cacheKey, values);
+            }
+            
             return values || [];
         } catch (error) {
             console.error(`Error leyendo ${sheetName}:`, error);
@@ -49,7 +60,6 @@ class SheetsClient {
         }
     }
 
-    // Convertir array de valores a objetos
     parseSheetData(values) {
         if (!values || values.length === 0) return [];
         
@@ -65,13 +75,16 @@ class SheetsClient {
         });
     }
 
-    // Agregar filas a una hoja
     async appendRows(sheetName, rows) {
         try {
             const result = await this.makeRequest('appendRows', { 
                 sheetName, 
                 rows 
             });
+            
+            cacheManager.clear(`sheet_${sheetName}`);
+            console.log(`✅ Filas agregadas a ${sheetName}`);
+            
             return result;
         } catch (error) {
             console.error(`Error agregando filas a ${sheetName}:`, error);
@@ -79,7 +92,6 @@ class SheetsClient {
         }
     }
 
-    // Actualizar rango específico
     async updateRange(sheetName, range, values) {
         try {
             const result = await this.makeRequest('updateRange', { 
@@ -87,6 +99,9 @@ class SheetsClient {
                 range, 
                 values 
             });
+            
+            cacheManager.clear(`sheet_${sheetName}`);
+            
             return result;
         } catch (error) {
             console.error(`Error actualizando ${sheetName}:`, error);
@@ -94,7 +109,6 @@ class SheetsClient {
         }
     }
 
-    // Encontrar fila por ID y actualizar
     async updateById(sheetName, id, updates) {
         try {
             const result = await this.makeRequest('updateById', { 
@@ -102,6 +116,10 @@ class SheetsClient {
                 id, 
                 updates 
             });
+            
+            cacheManager.clear(`sheet_${sheetName}`);
+            console.log(`✅ ${sheetName} actualizado (ID: ${id})`);
+            
             return result;
         } catch (error) {
             console.error(`Error actualizando por ID en ${sheetName}:`, error);
@@ -109,7 +127,6 @@ class SheetsClient {
         }
     }
 
-    // Generar nuevo ID
     async getNextId(sheetName) {
         try {
             const nextId = await this.makeRequest('getNextId', { 
@@ -122,7 +139,6 @@ class SheetsClient {
         }
     }
 
-    // Obtener letra de columna (A, B, C... Z, AA, AB...)
     getColumnLetter(columnNumber) {
         let letter = '';
         while (columnNumber > 0) {
@@ -134,5 +150,4 @@ class SheetsClient {
     }
 }
 
-// Instancia global
 const sheetsClient = new SheetsClient();

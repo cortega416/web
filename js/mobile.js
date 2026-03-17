@@ -75,3 +75,21 @@ document.addEventListener('DOMContentLoaded', () => {
         disableIosTextFieldZoom();
     }
 });
+
+// Detectar orientación del dispositivo
+window.addEventListener('orientationchange', () => {
+    // Recargar gráficos si es necesario
+    setTimeout(() => {
+        if (typeof updateCharts === 'function') {
+            updateCharts();
+        }
+    }, 500);
+});
+
+// Mostrar aviso en móvil cuando se abre
+if (window.innerWidth < 768) {
+    const chartResponsive = document.getElementById('chartResponsive');
+    if (chartResponsive) {
+        chartResponsive.style.display = 'block';
+    }
+}

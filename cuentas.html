@@ -8,7 +8,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h1>🎬 Streaming Manager</h1>
@@ -56,11 +55,10 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="topbar">
                 <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
-                <h2>Cuentas</h2>
+                <h2>🔐 Cuentas</h2>
                 <div class="topbar-actions">
                     <button class="btn btn-primary btn-sm" id="btnNuevaCuenta" onclick="openModalCuenta()">
                         ➕ <span class="hide-mobile">Nueva</span>
@@ -69,26 +67,25 @@
             </div>
 
             <div class="content">
-                <!-- Filters -->
+                <!-- Filtros -->
                 <div class="filters">
                     <div class="filter-group">
                         <input type="text" id="searchCuenta" placeholder="🔍 Buscar..." class="form-control">
                     </div>
                     <div class="filter-group">
                         <select id="filterServicio" class="form-control">
-                            <option value="">Todos los servicios</option>
+                            <option value="">Todos</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <select id="filterEstado" class="form-control">
                             <option value="activa">Activas</option>
-                            <option value="inactiva">Inactivas</option>
                             <option value="">Todas</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Cuentas Table -->
+                <!-- Tabla -->
                 <div class="card">
                     <div class="card-body">
                         <div class="table-container">
@@ -103,9 +100,7 @@
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <!-- Se carga dinámicamente -->
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
@@ -114,7 +109,7 @@
         </main>
     </div>
 
-    <!-- Modal Crear/Editar Cuenta -->
+    <!-- Modales -->
     <div class="modal-overlay" id="modalCuenta">
         <div class="modal">
             <div class="modal-header">
@@ -127,13 +122,11 @@
                     
                     <div class="form-group required">
                         <label for="cuentaServicio">Servicio</label>
-                        <select id="cuentaServicio" required>
-                            <option value="">Seleccionar...</option>
-                        </select>
+                        <select id="cuentaServicio" required></select>
                     </div>
 
                     <div class="form-group required">
-                        <label for="cuentaUsuario">Usuario / Login</label>
+                        <label for="cuentaUsuario">Usuario</label>
                         <input type="text" id="cuentaUsuario" required>
                     </div>
 
@@ -143,10 +136,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="cuentaCorreo">Correo Asociado</label>
-                        <select id="cuentaCorreo">
-                            <option value="">Ninguno</option>
-                        </select>
+                        <label for="cuentaCorreo">Correo</label>
+                        <select id="cuentaCorreo"></select>
                     </div>
 
                     <div class="form-group">
@@ -162,17 +153,14 @@
         </div>
     </div>
 
-    <!-- Modal Ver Perfiles -->
     <div class="modal-overlay" id="modalPerfiles">
         <div class="modal">
             <div class="modal-header">
-                <h3 id="modalPerfilesTitle">Perfiles de Cuenta</h3>
+                <h3 id="modalPerfilesTitle">Perfiles</h3>
                 <button class="modal-close" onclick="closeModalPerfiles()">✕</button>
             </div>
             <div class="modal-body">
-                <div id="perfilesContent">
-                    <!-- Se carga dinámicamente -->
-                </div>
+                <div id="perfilesContent"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModalPerfiles()">Cerrar</button>
@@ -180,7 +168,6 @@
         </div>
     </div>
 
-    <!-- Modal Asignar/Renovar/Editar Perfil -->
     <div class="modal-overlay" id="modalAccionPerfil">
         <div class="modal">
             <div class="modal-header">
@@ -195,12 +182,10 @@
                     <div id="formAsignar" style="display: none;">
                         <div class="form-group required">
                             <label for="asignarCliente">Cliente</label>
-                            <select id="asignarCliente" required>
-                                <option value="">Seleccionar...</option>
-                            </select>
+                            <select id="asignarCliente" required></select>
                         </div>
                         <div class="form-group required">
-                            <label for="asignarPrecio">Precio</label>
+                            <label for="asignarPrecio">Precio (S/)</label>
                             <input type="number" id="asignarPrecio" step="0.01" min="0" required>
                         </div>
                         <div class="form-group required">
@@ -211,7 +196,7 @@
 
                     <div id="formRenovar" style="display: none;">
                         <div class="form-group required">
-                            <label for="renovarPrecio">Precio Renovación</label>
+                            <label for="renovarPrecio">Precio (S/)</label>
                             <input type="number" id="renovarPrecio" step="0.01" min="0" required>
                         </div>
                         <div class="form-group required">
@@ -253,9 +238,11 @@
     </div>
 
     <script src="js/config.js"></script>
+    <script src="js/cache-manager.js"></script>
     <script src="js/sheetsClient.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/notifications.js"></script>
     <script src="js/mobile.js"></script>
     <script src="js/cuentas.js"></script>
 </body>

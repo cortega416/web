@@ -618,7 +618,7 @@ async function ejecutarAccionPerfil() {
     }
 }
 
-// Ejecutar asignación
+// Ejecutar asignación - CORREGIDO
 async function ejecutarAsignacion(perfilId) {
     const clienteId = document.getElementById('asignarCliente').value;
     const precio = document.getElementById('asignarPrecio').value;
@@ -631,6 +631,7 @@ async function ejecutarAsignacion(perfilId) {
         const perfil = perfiles.find(p => p.id == perfilId);
         const cuenta = cuentas.find(c => c.id == perfil.cuenta_id);
         const servicio = servicios.find(s => s.id == cuenta.servicio_id);
+        const cliente = clientes.find(c => c.id == clienteId);
         const session = Auth.getSession();
         
         const fechaInicio = Utils.getCurrentDate();
@@ -675,9 +676,26 @@ async function ejecutarAsignacion(perfilId) {
         ];
         await sheetsClient.appendRows(CONFIG.SHEETS.MOVIMIENTOS, [movimientoRow]);
         
-        Utils.showNotification('Perfil asignado correctamente', 'success');
+        Utils.showNotification('✅ Perfil asignado correctamente', 'success');
         
+        loadingOverlay.classList.remove('active');
         closeModalAccionPerfil();
+        
+        // Mostrar modal de WhatsApp para bienvenida
+        if (cliente && cliente.telefono) {
+            setTimeout(() => {
+                const mensaje = notificationSystem.generarMensajeBienvenida(
+                    cliente, 
+                    servicio, 
+                    perfil,
+                    duracion
+                );
+                notificationSystem.mostrarModalWhatsApp(cliente, mensaje, '📱 Enviar Bienvenida por WhatsApp');
+            }, 500);
+        } else {
+            Utils.showNotification('⚠️ El cliente no tiene teléfono registrado para notificaciones', 'warning');
+        }
+        
         await loadCuentas();
         
         if (currentCuentaId) {
@@ -686,13 +704,12 @@ async function ejecutarAsignacion(perfilId) {
         
     } catch (error) {
         console.error('Error asignando perfil:', error);
-        Utils.showNotification('Error asignando perfil: ' + error.message, 'error');
-    } finally {
+        Utils.showNotification('❌ Error asignando perfil: ' + error.message, 'error');
         loadingOverlay.classList.remove('active');
     }
 }
 
-// Ejecutar renovación
+// Ejecutar renovación - CORREGIDO
 async function ejecutarRenovacion(perfilId) {
     const precio = document.getElementById('renovarPrecio').value;
     const diasAdicionales = document.getElementById('renovarDias').value;
@@ -704,6 +721,7 @@ async function ejecutarRenovacion(perfilId) {
         const perfil = perfiles.find(p => p.id == perfilId);
         const cuenta = cuentas.find(c => c.id == perfil.cuenta_id);
         const servicio = servicios.find(s => s.id == cuenta.servicio_id);
+        const cliente = clientes.find(c => c.id == perfil.cliente_id);
         const session = Auth.getSession();
         
         const fechaFinActual = perfil.fecha_fin || Utils.getCurrentDate();
@@ -741,9 +759,23 @@ async function ejecutarRenovacion(perfilId) {
         ];
         await sheetsClient.appendRows(CONFIG.SHEETS.MOVIMIENTOS, [movimientoRow]);
         
-        Utils.showNotification('Perfil renovado correctamente', 'success');
+        Utils.showNotification('✅ Perfil renovado correctamente', 'success');
         
+        loadingOverlay.classList.remove('active');
         closeModalAccionPerfil();
+        
+        // Enviar notificación de renovación por WhatsApp
+        if (cliente && cliente.telefono) {
+            setTimeout(() => {
+                const mensaje = notificationSystem.generarMensajeRenovacion(
+                    cliente,
+                    servicio,
+                    Utils.formatDate(nuevaFechaFin)
+                );
+                notificationSystem.mostrarModalWhatsApp(cliente, mensaje, '📱 Notificar Renovación por WhatsApp');
+            }, 500);
+        }
+        
         await loadCuentas();
         
         if (currentCuentaId) {
@@ -752,8 +784,7 @@ async function ejecutarRenovacion(perfilId) {
         
     } catch (error) {
         console.error('Error renovando perfil:', error);
-        Utils.showNotification('Error renovando perfil: ' + error.message, 'error');
-    } finally {
+        Utils.showNotification('❌ Error renovando perfil: ' + error.message, 'error');
         loadingOverlay.classList.remove('active');
     }
 }
@@ -864,3 +895,4 @@ function renderCuentas(data) {
         `;
     }).join('');
 }
+
