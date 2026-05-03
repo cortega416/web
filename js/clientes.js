@@ -42,7 +42,7 @@ async function loadClientes() {
         servicios = sheetsClient.parseSheetData(serviciosData);
         perfiles = sheetsClient.parseSheetData(perfilesData);
         
-        renderClientes(clientes);
+        filterClientes();
     } catch (error) {
         console.error('Error cargando clientes:', error);
         Utils.showNotification('Error cargando clientes', 'error');
@@ -87,10 +87,10 @@ function renderClientes(data) {
                 <td>${estadoBadge}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-secondary" onclick="verDetalleCliente(${cliente.id})" title="Ver Detalle">👁️</button>
-                        <button class="btn btn-sm btn-secondary" onclick="editCliente(${cliente.id})" title="Editar">✏️</button>
+                        <button class="btn btn-sm btn-secondary" onclick="verDetalleCliente(${cliente.id})" title="Ver Detalle"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-sm btn-secondary" onclick="editCliente(${cliente.id})" title="Editar"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="toggleEstadoCliente(${cliente.id})" title="${cliente.estado === 'activo' ? 'Desactivar' : 'Activar'}">
-                            ${cliente.estado === 'activo' ? '🗑️' : '♻️'}
+                            <i class="fas fa-${cliente.estado === 'activo' ? 'trash' : 'undo'}"></i>
                         </button>
                     </div>
                 </td>
@@ -352,10 +352,10 @@ function renderClientes(data) {
                 <td class="hide-mobile">${estadoBadge}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-secondary" onclick="verDetalleCliente(${cliente.id})" title="Ver">👁️</button>
-                        <button class="btn btn-sm btn-secondary" onclick="editCliente(${cliente.id})" title="Editar">✏️</button>
+                        <button class="btn btn-sm btn-secondary" onclick="verDetalleCliente(${cliente.id})" title="Ver Detalle"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-sm btn-secondary" onclick="editCliente(${cliente.id})" title="Editar"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="toggleEstadoCliente(${cliente.id})" title="${cliente.estado === 'activo' ? 'Desactivar' : 'Activar'}">
-                            ${cliente.estado === 'activo' ? '🗑️' : '♻️'}
+                            <i class="fas fa-${cliente.estado === 'activo' ? 'trash' : 'undo'}"></i>
                         </button>
                     </div>
                 </td>

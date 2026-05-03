@@ -40,7 +40,7 @@ async function loadServicios() {
     try {
         const values = await sheetsClient.readSheet(CONFIG.SHEETS.SERVICIOS);
         servicios = sheetsClient.parseSheetData(values);
-        renderServicios(servicios);
+        filterServicios();
     } catch (error) {
         console.error('Error cargando servicios:', error);
         Utils.showNotification('Error cargando servicios', 'error');
@@ -90,9 +90,9 @@ function renderServicios(data) {
             html += `
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-secondary" onclick="editServicio(${servicio.id})">✏️</button>
-                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoServicio(${servicio.id})">
-                            ${servicio.estado === 'activo' ? '🗑️' : '♻️'}
+                        <button class="btn btn-sm btn-secondary" onclick="editServicio(${servicio.id})" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoServicio(${servicio.id})" title="${servicio.estado === 'activo' ? 'Desactivar' : 'Activar'}">
+                            <i class="fas fa-${servicio.estado === 'activo' ? 'trash' : 'undo'}"></i>
                         </button>
                     </div>
                 </td>
@@ -301,9 +301,9 @@ function renderServicios(data) {
             html += `
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-secondary" onclick="editServicio(${servicio.id})">✏️</button>
-                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoServicio(${servicio.id})">
-                            ${servicio.estado === 'activo' ? '🗑️' : '♻️'}
+                        <button class="btn btn-sm btn-secondary" onclick="editServicio(${servicio.id})" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoServicio(${servicio.id})" title="${servicio.estado === 'activo' ? 'Desactivar' : 'Activar'}">
+                            <i class="fas fa-${servicio.estado === 'activo' ? 'trash' : 'undo'}"></i>
                         </button>
                     </div>
                 </td>

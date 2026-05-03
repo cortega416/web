@@ -33,7 +33,7 @@ async function loadCorreos() {
         correos = sheetsClient.parseSheetData(correosData);
         cuentas = sheetsClient.parseSheetData(cuentasData);
         
-        renderCorreos(correos);
+        filterCorreos();
     } catch (error) {
         console.error('Error cargando correos:', error);
         Utils.showNotification('Error cargando correos', 'error');
@@ -77,7 +77,7 @@ function renderCorreos(data) {
                     <span style="font-family: monospace;">
                         ${correo.password ? '•'.repeat(8) : '-'}
                     </span>
-                    ${correo.password ? `<button class="btn btn-sm btn-secondary" onclick="mostrarPassword('${correo.password}')" title="Ver contraseña">👁️</button>` : ''}
+                    ${correo.password ? `<button class="btn btn-sm btn-secondary" onclick="mostrarPassword('${correo.password}')" title="Ver contraseña"><i class="fas fa-eye"></i></button>` : ''}
                 </td>
                 <td>${tipoBadge}</td>
                 <td>
@@ -86,9 +86,9 @@ function renderCorreos(data) {
                 <td>${estadoBadge}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-secondary" onclick="editCorreo(${correo.id})" title="Editar">✏️</button>
+                        <button class="btn btn-sm btn-secondary" onclick="editCorreo(${correo.id})" title="Editar"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="toggleEstadoCorreo(${correo.id})" title="${correo.estado === 'activo' ? 'Desactivar' : 'Activar'}">
-                            ${correo.estado === 'activo' ? '🗑️' : '♻️'}
+                            <i class="fas fa-${correo.estado === 'activo' ? 'trash' : 'undo'}"></i>
                         </button>
                     </div>
                 </td>
@@ -285,7 +285,7 @@ function renderCorreos(data) {
                     <span style="font-family: monospace; font-size: 11px;">
                         ${correo.password ? '••••••' : '-'}
                     </span>
-                    ${correo.password ? `<button class="btn btn-sm btn-secondary" onclick="mostrarPassword('${correo.password}')" title="Ver">👁️</button>` : ''}
+                    ${correo.password ? `<button class="btn btn-sm btn-secondary" onclick="mostrarPassword('${correo.password}')" title="Ver"><i class="fas fa-eye"></i></button>` : ''}
                 </td>
                 <td class="hide-mobile">${tipoBadge}</td>
                 <td>
@@ -294,9 +294,9 @@ function renderCorreos(data) {
                 <td class="hide-mobile">${estadoBadge}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-secondary" onclick="editCorreo(${correo.id})">✏️</button>
-                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoCorreo(${correo.id})">
-                            ${correo.estado === 'activo' ? '🗑️' : '♻️'}
+                        <button class="btn btn-sm btn-secondary" onclick="editCorreo(${correo.id})" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="toggleEstadoCorreo(${correo.id})" title="${correo.estado === 'activo' ? 'Desactivar' : 'Activar'}">
+                            <i class="fas fa-${correo.estado === 'activo' ? 'trash' : 'undo'}"></i>
                         </button>
                     </div>
                 </td>
