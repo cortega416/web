@@ -88,7 +88,7 @@ function renderStats() {
     
     const statsHTML = `
         <div class="stat-card">
-            <div class="stat-icon success">💰</div>
+            <div class="stat-icon success"><i class="fas fa-arrow-down"></i></div>
             <div class="stat-content">
                 <div class="stat-label">Total Entradas</div>
                 <div class="stat-value text-success">${Utils.formatCurrency(totalEntradas)}</div>
@@ -96,7 +96,7 @@ function renderStats() {
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon danger">💸</div>
+            <div class="stat-icon danger"><i class="fas fa-arrow-up"></i></div>
             <div class="stat-content">
                 <div class="stat-label">Total Salidas</div>
                 <div class="stat-value text-danger">${Utils.formatCurrency(totalSalidas)}</div>
@@ -104,7 +104,7 @@ function renderStats() {
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon ${balance >= 0 ? 'success' : 'danger'}">📊</div>
+            <div class="stat-icon ${balance >= 0 ? 'success' : 'danger'}"><i class="fas fa-chart-bar"></i></div>
             <div class="stat-content">
                 <div class="stat-label">Balance Total</div>
                 <div class="stat-value ${balance >= 0 ? 'text-success' : 'text-danger'}">
@@ -114,7 +114,7 @@ function renderStats() {
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon primary">📅</div>
+            <div class="stat-icon primary"><i class="fas fa-calendar-alt"></i></div>
             <div class="stat-content">
                 <div class="stat-label">Balance del Mes</div>
                 <div class="stat-value">
@@ -177,7 +177,7 @@ function renderMovimientos(data) {
                     <td>
                         <div class="table-actions">
                             ${!esEliminado ? `
-                                <button class="btn btn-sm btn-danger" onclick="eliminarMovimiento(${mov.id})" title="Eliminar">🗑️</button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarMovimiento(${mov.id})" title="Eliminar"><i class="fas fa-trash"></i></button>
                             ` : ''}
                         </div>
                     </td>
@@ -434,7 +434,7 @@ function renderMovimientos(data) {
                     <td>
                         <div class="table-actions">
                             ${!esEliminado ? `
-                                <button class="btn btn-sm btn-danger" onclick="eliminarMovimiento(${mov.id})">🗑️</button>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarMovimiento(${mov.id})" title="Eliminar"><i class="fas fa-trash"></i></button>
                             ` : ''}
                         </div>
                     </td>

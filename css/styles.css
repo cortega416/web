@@ -231,13 +231,17 @@ body {
 }
 
 .sidebar-header .user-info::before {
-    content: '👤';
-    font-size: 14px;
+    content: '\f007';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 12px;
 }
 
 .sidebar-nav {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     padding: 16px 12px;
 }
 
@@ -1302,8 +1306,9 @@ canvas {
         position: fixed;
         top: 0;
         left: 0;
+        bottom: 0;
         width: 280px;
-        height: 100vh;
+        overflow: hidden;
         transform: translateX(-100%);
         z-index: 1000;
         transition: transform var(--transition-normal);

@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Movimientos - Streaming Manager</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>🎬 Streaming Manager</h1>
+                <h1><i class="fas fa-film"></i> Streaming Manager</h1>
                 <div class="user-info">
                     <span id="userDisplay"></span>
                 </div>
@@ -19,35 +20,35 @@
             
             <nav class="sidebar-nav">
                 <a href="https://hansweb.me/" class="nav-item">
-                    <span class="icon">🌐</span>
+                    <span class="icon"><i class="fas fa-globe"></i></span>
                     <span>HANS WEB</span>
                 </a>
                 <a href="dashboard.html" class="nav-item">
-                    <span class="icon">📊</span>
+                    <span class="icon"><i class="fas fa-chart-bar"></i></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="servicios.html" class="nav-item">
-                    <span class="icon">🎯</span>
+                    <span class="icon"><i class="fas fa-tv"></i></span>
                     <span>Servicios</span>
                 </a>
                 <a href="clientes.html" class="nav-item">
-                    <span class="icon">👥</span>
+                    <span class="icon"><i class="fas fa-users"></i></span>
                     <span>Clientes</span>
                 </a>
                 <a href="correos.html" class="nav-item" id="navCorreos">
-                    <span class="icon">📧</span>
+                    <span class="icon"><i class="fas fa-envelope"></i></span>
                     <span>Correos</span>
                 </a>
                 <a href="cuentas.html" class="nav-item">
-                    <span class="icon">🔐</span>
+                    <span class="icon"><i class="fas fa-lock"></i></span>
                     <span>Cuentas</span>
                 </a>
-                <a href="movimientos.html" class="nav-item active">
-                    <span class="icon">💰</span>
+                <a href="movimientos.html" class="nav-item" active>
+                     <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
                     <span>Movimientos</span>
                 </a>
                 <a href="alertas.html" class="nav-item">
-                    <span class="icon">⚠️</span>
+                    <span class="icon"><i class="fas fa-bell"></i></span>
                     <span>Alertas</span>
                     <span class="badge" id="alertBadge"></span>
                 </a>
@@ -55,7 +56,7 @@
             
             <div class="sidebar-footer">
                 <button class="btn btn-secondary btn-block" onclick="Auth.logout()">
-                    Cerrar Sesión
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
             </div>
         </aside>
@@ -67,10 +68,10 @@
                 <h2>Movimientos</h2>
                 <div class="topbar-actions">
                     <button class="btn btn-success btn-sm" onclick="openModalMovimiento('entrada')">
-                        ➕ <span class="hide-mobile">Entrada</span>
+                        <i class="fas fa-minus"></i> <span class="hide-mobile">Entrada</span>
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="openModalMovimiento('salida')">
-                        ➖ <span class="hide-mobile">Salida</span>
+                        <i class="fa-solid fa-plus"></i> <span class="hide-mobile">Salida</span>
                     </button>
                 </div>
             </div>
@@ -84,7 +85,7 @@
                 <!-- Filters -->
                 <div class="filters">
                     <div class="filter-group">
-                        <input type="text" id="searchMovimiento" placeholder="🔍 Buscar..." class="form-control">
+                        <input type="text" id="searchMovimiento" placeholder="Buscar..." class="form-control">
                     </div>
                     <div class="filter-group">
                         <select id="filterTipo" class="form-control">
@@ -146,7 +147,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalMovimientoTitle">Nuevo Movimiento</h3>
-                <button class="modal-close" onclick="closeModalMovimiento()">✕</button>
+                <button class="modal-close" onclick="closeModalMovimiento()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="formMovimiento">
