@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cuentas - Streaming Manager</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>🎬 Streaming Manager</h1>
+                <h1><i class="fas fa-film"></i> Streaming Manager</h1>
                 <div class="user-info">
                     <span id="userDisplay"></span>
                 </div>
@@ -18,35 +19,35 @@
             
             <nav class="sidebar-nav">
                 <a href="https://hansweb.me/" class="nav-item">
-                    <span class="icon">🌐</span>
+                    <span class="icon"><i class="fas fa-globe"></i></span>
                     <span>HANS WEB</span>
                 </a>
                 <a href="dashboard.html" class="nav-item">
-                    <span class="icon">📊</span>
+                    <span class="icon"><i class="fas fa-chart-bar"></i></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="servicios.html" class="nav-item">
-                    <span class="icon">🎯</span>
+                    <span class="icon"><i class="fas fa-tv"></i></span>
                     <span>Servicios</span>
                 </a>
                 <a href="clientes.html" class="nav-item">
-                    <span class="icon">👥</span>
+                    <span class="icon"><i class="fas fa-users"></i></span>
                     <span>Clientes</span>
                 </a>
                 <a href="correos.html" class="nav-item" id="navCorreos">
-                    <span class="icon">📧</span>
+                    <span class="icon"><i class="fas fa-envelope"></i></span>
                     <span>Correos</span>
                 </a>
                 <a href="cuentas.html" class="nav-item active">
-                    <span class="icon">🔐</span>
+                    <span class="icon"><i class="fas fa-lock"></i></span>
                     <span>Cuentas</span>
                 </a>
                 <a href="movimientos.html" class="nav-item">
-                    <span class="icon">💰</span>
+                    <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
                     <span>Movimientos</span>
                 </a>
                 <a href="alertas.html" class="nav-item">
-                    <span class="icon">⚠️</span>
+                    <span class="icon"><i class="fas fa-bell"></i></span>
                     <span>Alertas</span>
                     <span class="badge" id="alertBadge"></span>
                 </a>
@@ -54,18 +55,18 @@
             
             <div class="sidebar-footer">
                 <button class="btn btn-secondary btn-block" onclick="Auth.logout()">
-                    Cerrar Sesión
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="topbar">
-                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">☰</button>
-                <h2>🔐 Cuentas</h2>
+                <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i></button>
+                <h2><i class="fas fa-lock"></i> Cuentas</h2>
                 <div class="topbar-actions">
                     <button class="btn btn-primary btn-sm" id="btnNuevaCuenta" onclick="openModalCuenta()">
-                        ➕ <span class="hide-mobile">Nueva</span>
+                        <i class="fas fa-plus"></i> <span class="hide-mobile">Nueva</span>
                     </button>
                 </div>
             </div>
@@ -74,7 +75,7 @@
                 <!-- Filtros -->
                 <div class="filters">
                     <div class="filter-group">
-                        <input type="text" id="searchCuenta" placeholder="🔍 Buscar..." class="form-control">
+                        <input type="text" id="searchCuenta" placeholder="Buscar..." class="form-control">
                     </div>
                     <div class="filter-group">
                         <select id="filterServicio" class="form-control">
@@ -118,7 +119,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalCuentaTitle">Nueva Cuenta</h3>
-                <button class="modal-close" onclick="closeModalCuenta()">✕</button>
+                <button class="modal-close" onclick="closeModalCuenta()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="formCuenta">
@@ -161,7 +162,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalPerfilesTitle">Perfiles</h3>
-                <button class="modal-close" onclick="closeModalPerfiles()">✕</button>
+                <button class="modal-close" onclick="closeModalPerfiles()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <div id="perfilesContent"></div>
@@ -176,7 +177,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalAccionPerfilTitle">Acción Perfil</h3>
-                <button class="modal-close" onclick="closeModalAccionPerfil()">✕</button>
+                <button class="modal-close" onclick="closeModalAccionPerfil()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="formAccionPerfil">

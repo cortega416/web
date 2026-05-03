@@ -55,7 +55,7 @@ async function loadCuentas() {
         // Poblar select de filtro de servicios
         populateServiciosFilter();
         
-        renderCuentas(cuentas);
+        filterCuentas();
     } catch (error) {
         console.error('Error cargando cuentas:', error);
         Utils.showNotification('Error cargando cuentas', 'error');
@@ -119,11 +119,11 @@ function renderCuentas(data) {
                 <td>${estadoBadge}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-primary" onclick="verPerfiles(${cuenta.id})" title="Ver Perfiles">👁️</button>
+                        <button class="btn btn-sm btn-primary" onclick="verPerfiles(${cuenta.id})" title="Ver Perfiles"><i class="fas fa-eye"></i></button>
                         ${Auth.isAdmin() ? `
-                            <button class="btn btn-sm btn-secondary" onclick="editCuenta(${cuenta.id})" title="Editar">✏️</button>
+                            <button class="btn btn-sm btn-secondary" onclick="editCuenta(${cuenta.id})" title="Editar"><i class="fas fa-edit"></i></button>
                             <button class="btn btn-sm btn-danger" onclick="toggleEstadoCuenta(${cuenta.id})" title="${cuenta.estado === 'activa' ? 'Desactivar' : 'Activar'}">
-                                ${cuenta.estado === 'activa' ? '🗑️' : '♻️'}
+                                <i class="fas fa-${cuenta.estado === 'activa' ? 'trash' : 'undo'}"></i>
                             </button>
                         ` : ''}
                     </div>
