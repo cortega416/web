@@ -313,20 +313,18 @@ async function guardarMovimiento() {
         };
         
         const newId = await sheetsClient.getNextId(CONFIG.SHEETS.MOVIMIENTOS);
-        const newRow = [
-            newId,
-            movimientoData.tipo,
-            movimientoData.categoria,
-            movimientoData.monto,
-            movimientoData.cliente_id,
-            movimientoData.servicio_id,
-            movimientoData.metodo_pago,
-            movimientoData.fecha,
-            movimientoData.usuario_id,
-            movimientoData.notas
-        ];
-        
-        await sheetsClient.appendRows(CONFIG.SHEETS.MOVIMIENTOS, [newRow]);
+        await sheetsClient.appendObjects(CONFIG.SHEETS.MOVIMIENTOS, [{
+            id: newId,
+            tipo: movimientoData.tipo,
+            categoria: movimientoData.categoria,
+            monto: movimientoData.monto,
+            cliente_id: movimientoData.cliente_id,
+            servicio_id: movimientoData.servicio_id,
+            metodo_pago: movimientoData.metodo_pago,
+            fecha: movimientoData.fecha,
+            usuario_id: movimientoData.usuario_id,
+            notas: movimientoData.notas
+        }]);
         
         Utils.showNotification('Movimiento registrado correctamente', 'success');
         

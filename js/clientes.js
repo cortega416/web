@@ -182,20 +182,39 @@ async function guardarCliente() {
             await sheetsClient.updateById(CONFIG.SHEETS.CLIENTES, id, clienteData);
             Utils.showNotification('Cliente actualizado correctamente', 'success');
         } else {
+            const telefonoKey = Utils.normalizePhone(clienteData.telefono);
+            const emailKey = Utils.normalizeKey(clienteData.email);
+            const clienteExistente = clientes.find(cliente => {
+                const mismoTelefono = telefonoKey && Utils.normalizePhone(cliente.telefono) === telefonoKey;
+                const mismoEmail = emailKey && Utils.normalizeKey(cliente.email) === emailKey;
+                return mismoTelefono || mismoEmail;
+            });
+            
+            if (clienteExistente) {
+                await sheetsClient.updateById(CONFIG.SHEETS.CLIENTES, clienteExistente.id, {
+                    ...clienteData,
+                    estado: clienteExistente.estado || 'activo'
+                });
+                
+                Utils.showNotification(`Cliente existente actualizado con ID ${clienteExistente.id}`, 'success');
+                closeModalCliente();
+                await loadClientes();
+                return;
+            }
+            
             // Crear nuevo
             const newId = await sheetsClient.getNextId(CONFIG.SHEETS.CLIENTES);
-            const newRow = [
-                newId,
-                clienteData.nombre,
-                clienteData.telefono,
-                clienteData.email,
-                clienteData.direccion,
-                Utils.getCurrentDate(),
-                'activo',
-                clienteData.notas
-            ];
             
-            await sheetsClient.appendRows(CONFIG.SHEETS.CLIENTES, [newRow]);
+            await sheetsClient.appendObjects(CONFIG.SHEETS.CLIENTES, [{
+                id: newId,
+                nombre: clienteData.nombre,
+                telefono: clienteData.telefono,
+                email: clienteData.email,
+                direccion: clienteData.direccion,
+                fecha_registro: Utils.getCurrentDate(),
+                estado: 'activo',
+                notas: clienteData.notas
+            }]);
             Utils.showNotification('Cliente creado correctamente', 'success');
         }
         

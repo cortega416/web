@@ -74,7 +74,7 @@ function calcularAlertas() {
             if (perfil.estado !== 'ocupado' || !perfil.fecha_fin) return false;
             
             const daysRemaining = Utils.getDaysRemaining(perfil.fecha_fin);
-            return daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= alertDays;
+            return daysRemaining !== null && daysRemaining <= alertDays;
         })
         .map(perfil => {
             const cuenta = cuentas.find(c => c.id == perfil.cuenta_id);
@@ -91,10 +91,41 @@ function calcularAlertas() {
                 cliente,
                 suscripcion,
                 daysRemaining,
-                urgencia: daysRemaining <= 3 ? 'critico' : 'urgente'
+                urgencia: daysRemaining < 0 ? 'vencido' : daysRemaining <= 3 ? 'critico' : 'urgente'
             };
         })
         .sort((a, b) => a.daysRemaining - b.daysRemaining);
+}
+
+function getAlertaBadge(alerta) {
+    if (alerta.urgencia === 'vencido') {
+        return '<span class="badge badge-danger"><strong>Vencido</strong></span>';
+    }
+    
+    if (alerta.urgencia === 'critico') {
+        return '<span class="badge badge-danger"><strong>Critico</strong></span>';
+    }
+    
+    return '<span class="badge badge-warning"><strong>Urgente</strong></span>';
+}
+
+function getAlertaBadgeClass(alerta) {
+    return alerta.urgencia === 'urgente' ? 'warning' : 'danger';
+}
+
+function getAlertaDiasTexto(alerta) {
+    const dias = parseInt(alerta.daysRemaining, 10);
+    
+    if (dias < 0) {
+        const vencidoHace = Math.abs(dias);
+        return `Vencido hace ${vencidoHace} dia${vencidoHace !== 1 ? 's' : ''}`;
+    }
+    
+    if (dias === 0) {
+        return 'Vence hoy';
+    }
+    
+    return `Vence en ${dias} dia${dias !== 1 ? 's' : ''}`;
 }
 
 // Poblar filtro de servicios
@@ -167,16 +198,134 @@ function renderAlertas(data) {
                 <td>
                     <div class="table-actions">
                         ${tieneWhatsApp ? `
-                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar">
-                                📱
-                            </button>
+                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar"><i class="fa-brands fa-whatsapp"></i></button>
                         ` : ''}
-                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar">
-                            ✅
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar">
-                            🗑️
-                        </button>
+                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar"><i class="fa-solid fa-rotate-right"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Render definitivo: incluye vencidos y evita mostrar dias negativos.
+function renderAlertas(data) {
+    const tbody = document.querySelector('#alertasTable tbody');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    tbody.innerHTML = data.map(alerta => {
+        const urgenciaBadge = getAlertaBadge(alerta);
+        const badgeClass = getAlertaBadgeClass(alerta);
+        const diasTexto = getAlertaDiasTexto(alerta);
+        const clienteNombre = alerta.cliente
+            ? (alerta.cliente.nombre.length > 20 ? alerta.cliente.nombre.substring(0, 20) + '...' : alerta.cliente.nombre)
+            : 'N/A';
+        const servicioNombre = alerta.servicio ? alerta.servicio.nombre : 'N/A';
+        const tieneWhatsApp = alerta.cliente && alerta.cliente.telefono;
+        
+        return `
+            <tr>
+                <td data-label="Urgencia">${urgenciaBadge}</td>
+                <td data-label="Cliente">
+                    <strong style="font-size: 12px;">${clienteNombre}</strong>
+                    <div class="show-mobile text-muted" style="font-size: 10px; margin-top: 4px;">
+                        ${servicioNombre}
+                    </div>
+                </td>
+                <td data-label="Servicio" class="hide-mobile" style="font-size: 11px;">${servicioNombre}</td>
+                <td data-label="Perfil" class="hide-mobile" style="font-size: 11px;">Perfil #${alerta.perfil.numero}</td>
+                <td data-label="Vencimiento" style="white-space: nowrap; font-size: 11px;">
+                    ${Utils.formatDate(alerta.perfil.fecha_fin)}
+                    <div class="show-mobile">
+                        <span class="badge badge-${badgeClass}" style="font-size: 9px; margin-top: 4px;">
+                            ${diasTexto}
+                        </span>
+                    </div>
+                </td>
+                <td data-label="Dias" class="hide-mobile">
+                    <span class="badge badge-${badgeClass}">
+                        ${diasTexto}
+                    </span>
+                </td>
+                <td data-label="Precio" class="hide-mobile" style="white-space: nowrap;">${alerta.suscripcion ? Utils.formatCurrency(alerta.suscripcion.precio) : '-'}</td>
+                <td data-label="Acciones" class="actions-cell">
+                    <div class="table-actions" style="justify-content: center; gap: 6px;">
+                        ${tieneWhatsApp ? `
+                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar"><i class="fa-brands fa-whatsapp"></i></button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar"><i class="fa-solid fa-rotate-right"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Render final de alertas con soporte para vencidos.
+function renderAlertas(data) {
+    const tbody = document.querySelector('#alertasTable tbody');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    tbody.innerHTML = data.map(alerta => {
+        const urgenciaBadge = getAlertaBadge(alerta);
+        const badgeClass = getAlertaBadgeClass(alerta);
+        const diasTexto = getAlertaDiasTexto(alerta);
+        const clienteNombre = alerta.cliente
+            ? (alerta.cliente.nombre.length > 20 ? alerta.cliente.nombre.substring(0, 20) + '...' : alerta.cliente.nombre)
+            : 'N/A';
+        const servicioNombre = alerta.servicio ? alerta.servicio.nombre : 'N/A';
+        const tieneWhatsApp = alerta.cliente && alerta.cliente.telefono;
+        
+        return `
+            <tr>
+                <td data-label="Urgencia">${urgenciaBadge}</td>
+                <td data-label="Cliente">
+                    <strong style="font-size: 12px;">${clienteNombre}</strong>
+                    <div class="show-mobile text-muted" style="font-size: 10px; margin-top: 4px;">
+                        ${servicioNombre}
+                    </div>
+                </td>
+                <td data-label="Servicio" class="hide-mobile" style="font-size: 11px;">${servicioNombre}</td>
+                <td data-label="Perfil" class="hide-mobile" style="font-size: 11px;">Perfil #${alerta.perfil.numero}</td>
+                <td data-label="Vencimiento" style="white-space: nowrap; font-size: 11px;">
+                    ${Utils.formatDate(alerta.perfil.fecha_fin)}
+                    <div class="show-mobile">
+                        <span class="badge badge-${badgeClass}" style="font-size: 9px; margin-top: 4px;">
+                            ${diasTexto}
+                        </span>
+                    </div>
+                </td>
+                <td data-label="Dias" class="hide-mobile">
+                    <span class="badge badge-${badgeClass}">
+                        ${diasTexto}
+                    </span>
+                </td>
+                <td data-label="Precio" class="hide-mobile" style="white-space: nowrap;">${alerta.suscripcion ? Utils.formatCurrency(alerta.suscripcion.precio) : '-'}</td>
+                <td data-label="Acciones" class="actions-cell">
+                    <div class="table-actions" style="justify-content: center; gap: 6px;">
+                        ${tieneWhatsApp ? `
+                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar"><i class="fa-brands fa-whatsapp"></i></button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar"><i class="fa-solid fa-rotate-right"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </td>
             </tr>
@@ -461,8 +610,8 @@ async function liberarPerfilAlerta(perfilId) {
     }
 }
 
-// Renderizar tabla de alertas - OPTIMIZADA PARA MÓVIL
-function renderAlertas(data) {
+// Renderizar tabla de alertas - OPTIMIZADA PARA MOVIL (legacy)
+function renderAlertasMobileLegacy(data) {
     const tbody = document.querySelector('#alertasTable tbody');
     const emptyState = document.getElementById('emptyState');
     
@@ -513,16 +662,10 @@ function renderAlertas(data) {
                 <td data-label="Acciones" class="actions-cell">
                     <div class="table-actions" style="justify-content: center; gap: 6px;">
                         ${tieneWhatsApp ? `
-                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar">
-                                📱
-                            </button>
+                            <button class="btn btn-sm btn-info" onclick="notificarVencimientoWhatsApp(${alerta.cliente.id}, ${alerta.perfil.id}, ${alerta.daysRemaining}, '${Utils.formatDate(alerta.perfil.fecha_fin)}')" title="Notificar"><i class="fa-brands fa-whatsapp"></i></button>
                         ` : ''}
-                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar">
-                            ✅
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar">
-                            🗑️
-                        </button>
+                        <button class="btn btn-sm btn-success" onclick="openRenovarModal(${alerta.perfil.id})" title="Renovar"><i class="fa-solid fa-rotate-right"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="liberarPerfilAlerta(${alerta.perfil.id})" title="Liberar"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </td>
             </tr>

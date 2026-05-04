@@ -194,22 +194,38 @@ async function guardarServicio() {
             await sheetsClient.updateById(CONFIG.SHEETS.SERVICIOS, id, servicioData);
             Utils.showNotification('Servicio actualizado correctamente', 'success');
         } else {
+            const servicioExistente = servicios.find(servicio =>
+                Utils.normalizeKey(servicio.nombre) === Utils.normalizeKey(servicioData.nombre) &&
+                Utils.normalizeKey(servicio.tipo) === Utils.normalizeKey(servicioData.tipo)
+            );
+            
+            if (servicioExistente) {
+                await sheetsClient.updateById(CONFIG.SHEETS.SERVICIOS, servicioExistente.id, {
+                    ...servicioData,
+                    estado: servicioExistente.estado || 'activo'
+                });
+                
+                Utils.showNotification(`Servicio existente actualizado con ID ${servicioExistente.id}`, 'success');
+                closeModalServicio();
+                await loadServicios();
+                return;
+            }
+            
             // Crear nuevo
             const newId = await sheetsClient.getNextId(CONFIG.SHEETS.SERVICIOS);
-            const newRow = [
-                newId,
-                servicioData.nombre,
-                servicioData.tipo,
-                servicioData.precio_venta,
-                servicioData.costo_base,
-                servicioData.duracion_dias,
-                servicioData.perfiles_max,
-                servicioData.visible_para,
-                'activo',
-                servicioData.notas
-            ];
             
-            await sheetsClient.appendRows(CONFIG.SHEETS.SERVICIOS, [newRow]);
+            await sheetsClient.appendObjects(CONFIG.SHEETS.SERVICIOS, [{
+                id: newId,
+                nombre: servicioData.nombre,
+                tipo: servicioData.tipo,
+                precio_venta: servicioData.precio_venta,
+                costo_base: servicioData.costo_base,
+                duracion_dias: servicioData.duracion_dias,
+                perfiles_max: servicioData.perfiles_max,
+                visible_para: servicioData.visible_para,
+                estado: 'activo',
+                notas: servicioData.notas
+            }]);
             Utils.showNotification('Servicio creado correctamente', 'success');
         }
         

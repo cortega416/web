@@ -63,16 +63,54 @@ class SheetsClient {
     parseSheetData(values) {
         if (!values || values.length === 0) return [];
         
-        const headers = values[0];
+        const headers = Array.isArray(values[0])
+            ? values[0].map(header => String(header || '').trim())
+            : [];
+        if (headers.length === 0) return [];
+        
         const rows = values.slice(1);
         
-        return rows.map(row => {
-            const obj = {};
-            headers.forEach((header, index) => {
-                obj[header] = row[index] !== undefined ? row[index] : '';
+        return rows
+            .filter(row => Array.isArray(row) && row.some(cell => cell !== undefined && cell !== null && String(cell).trim() !== ''))
+            .map(row => {
+                const obj = {};
+                const headerCount = {};
+                
+                headers.forEach((header, index) => {
+                    if (!header) return;
+                    
+                    const value = row[index] !== undefined ? row[index] : '';
+                    
+                    if (!Object.prototype.hasOwnProperty.call(obj, header)) {
+                        obj[header] = value;
+                        headerCount[header] = 1;
+                        return;
+                    }
+                    
+                    headerCount[header] += 1;
+                    obj[`${header}_${headerCount[header]}`] = value;
+                    
+                    if ((obj[header] === '' || obj[header] === undefined || obj[header] === null) && value !== '') {
+                        obj[header] = value;
+                    }
+                });
+                
+                return obj;
             });
-            return obj;
+    }
+
+    buildRowFromHeaders(headers, data) {
+        return headers.map(header => {
+            const key = String(header || '').trim();
+            return data[key] !== undefined && data[key] !== null ? data[key] : '';
         });
+    }
+
+    async appendObjects(sheetName, objects) {
+        const values = await this.readSheet(sheetName);
+        const headers = values && values.length > 0 ? values[0] : [];
+        const rows = objects.map(object => this.buildRowFromHeaders(headers, object));
+        return this.appendRows(sheetName, rows);
     }
 
     async appendRows(sheetName, rows) {

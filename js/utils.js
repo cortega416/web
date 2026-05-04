@@ -82,6 +82,22 @@ class Utils {
         return div.innerHTML;
     }
 
+    static normalizeKey(value) {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    static normalizePhone(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    static sameId(a, b) {
+        return String(a || '').trim() === String(b || '').trim();
+    }
+
     // Generar ID único temporal
     static generateTempId() {
         return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -106,7 +122,7 @@ class Utils {
                 if (perfil.estado !== 'ocupado' || !perfil.fecha_fin) return false;
                 
                 const daysRemaining = this.getDaysRemaining(perfil.fecha_fin);
-                return daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= alertDays;
+                return daysRemaining !== null && daysRemaining <= alertDays;
             });
             
             return alertas.length;

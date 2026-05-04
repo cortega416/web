@@ -223,6 +223,91 @@ async function populateCorreosSelect() {
     });
 }
 
+function findCuentaExistente(cuentaData, excludeId = null) {
+    const servicioId = String(cuentaData.servicio_id || '').trim();
+    const usuarioKey = Utils.normalizeKey(cuentaData.usuario);
+    const correoId = String(cuentaData.correo_id || '').trim();
+    
+    return cuentas.find(cuenta => {
+        if (excludeId && Utils.sameId(cuenta.id, excludeId)) return false;
+        if (!Utils.sameId(cuenta.servicio_id, servicioId)) return false;
+        
+        const mismoUsuario = usuarioKey && Utils.normalizeKey(cuenta.usuario) === usuarioKey;
+        const mismoCorreo = correoId && Utils.sameId(cuenta.correo_id, correoId);
+        
+        return mismoUsuario || mismoCorreo;
+    });
+}
+
+async function ensurePerfilesForCuenta(cuentaId, servicio) {
+    if (!servicio) return;
+    
+    const perfilesMax = parseInt(servicio.perfiles_max, 10) || 1;
+    const perfilesCuenta = perfiles.filter(perfil => Utils.sameId(perfil.cuenta_id, cuentaId));
+    const numerosExistentes = new Set(
+        perfilesCuenta
+            .map(perfil => parseInt(perfil.numero, 10))
+            .filter(numero => Number.isFinite(numero))
+    );
+    
+    const perfilesPendientes = [];
+    let nextPerfilId = null;
+    
+    for (let numero = 1; numero <= perfilesMax; numero++) {
+        if (numerosExistentes.has(numero)) continue;
+        
+        if (nextPerfilId === null) {
+            nextPerfilId = parseInt(await sheetsClient.getNextId(CONFIG.SHEETS.PERFILES), 10);
+        }
+        
+        perfilesPendientes.push({
+            id: nextPerfilId,
+            cuenta_id: cuentaId,
+            numero,
+            nombre: '',
+            pin: '',
+            estado: 'disponible',
+            cliente_id: '',
+            fecha_inicio: '',
+            fecha_fin: '',
+            notas: ''
+        });
+        
+        nextPerfilId += 1;
+    }
+    
+    if (perfilesPendientes.length > 0) {
+        await sheetsClient.appendObjects(CONFIG.SHEETS.PERFILES, perfilesPendientes);
+    }
+}
+
+async function createPerfilesForCuenta(cuentaId, servicio) {
+    if (!servicio) return;
+    
+    const perfilesMax = parseInt(servicio.perfiles_max, 10) || 1;
+    const perfilesRows = [];
+    let nextPerfilId = parseInt(await sheetsClient.getNextId(CONFIG.SHEETS.PERFILES), 10);
+    
+    for (let i = 1; i <= perfilesMax; i++) {
+        perfilesRows.push({
+            id: nextPerfilId,
+            cuenta_id: cuentaId,
+            numero: i,
+            nombre: '',
+            pin: '',
+            estado: 'disponible',
+            cliente_id: '',
+            fecha_inicio: '',
+            fecha_fin: '',
+            notas: ''
+        });
+        
+        nextPerfilId += 1;
+    }
+    
+    await sheetsClient.appendObjects(CONFIG.SHEETS.PERFILES, perfilesRows);
+}
+
 // Editar cuenta
 function editCuenta(id) {
     openModalCuenta(id);
@@ -253,48 +338,44 @@ async function guardarCuenta() {
         if (id) {
             // Actualizar
             await sheetsClient.updateById(CONFIG.SHEETS.CUENTAS, id, cuentaData);
+            
+            const servicio = servicios.find(s => Utils.sameId(s.id, cuentaData.servicio_id));
+            await ensurePerfilesForCuenta(id, servicio);
+            
             Utils.showNotification('Cuenta actualizada correctamente', 'success');
         } else {
-            // Crear nueva cuenta
-            const newId = await sheetsClient.getNextId(CONFIG.SHEETS.CUENTAS);
-            const servicio = servicios.find(s => s.id == cuentaData.servicio_id);
+            const cuentaExistente = findCuentaExistente(cuentaData);
+            const servicio = servicios.find(s => Utils.sameId(s.id, cuentaData.servicio_id));
             
-            const newRow = [
-                newId,
-                cuentaData.servicio_id,
-                cuentaData.usuario,
-                cuentaData.password,
-                cuentaData.correo_id,
-                Utils.getCurrentDate(),
-                'activa',
-                cuentaData.notas
-            ];
+            if (cuentaExistente) {
+                await sheetsClient.updateById(CONFIG.SHEETS.CUENTAS, cuentaExistente.id, {
+                    ...cuentaData,
+                    estado: cuentaExistente.estado || 'activa'
+                });
+                await ensurePerfilesForCuenta(cuentaExistente.id, servicio);
+                
+                Utils.showNotification(`Cuenta existente actualizada con ID ${cuentaExistente.id}`, 'success');
+                closeModalCuenta();
+                await loadCuentas();
+                return;
+            }
             
-            await sheetsClient.appendRows(CONFIG.SHEETS.CUENTAS, [newRow]);
+            // En este sistema, Cuentas.id debe coincidir con servicio_id.
+            const newId = cuentaData.servicio_id;
+            
+            await sheetsClient.appendObjects(CONFIG.SHEETS.CUENTAS, [{
+                id: newId,
+                servicio_id: cuentaData.servicio_id,
+                usuario: cuentaData.usuario,
+                password: cuentaData.password,
+                correo_id: cuentaData.correo_id,
+                fecha_creacion: Utils.getCurrentDate(),
+                estado: 'activa',
+                notas: cuentaData.notas
+            }]);
             
             // Crear perfiles automáticamente
-            if (servicio) {
-                const perfilesMax = parseInt(servicio.perfiles_max) || 1;
-                const perfilesRows = [];
-                const basePerfilId = await sheetsClient.getNextId(CONFIG.SHEETS.PERFILES);
-                
-                for (let i = 1; i <= perfilesMax; i++) {
-                    perfilesRows.push([
-                        basePerfilId + (i - 1),
-                        newId,
-                        i,
-                        '',
-                        '',
-                        'disponible',
-                        '',
-                        '',
-                        '',
-                        ''
-                    ]);
-                }
-                
-                await sheetsClient.appendRows(CONFIG.SHEETS.PERFILES, perfilesRows);
-            }
+            await createPerfilesForCuenta(newId, servicio);
             
             Utils.showNotification('Cuenta y perfiles creados correctamente', 'success');
         }
@@ -647,34 +728,32 @@ async function ejecutarAsignacion(perfilId) {
         
         // 2. Crear suscripción
         const suscripcionId = await sheetsClient.getNextId(CONFIG.SHEETS.SUSCRIPCIONES);
-        const suscripcionRow = [
-            suscripcionId,
-            clienteId,
-            servicio.id,
-            cuenta.id,
-            perfilId,
-            fechaInicio,
-            fechaFin,
+        await sheetsClient.appendObjects(CONFIG.SHEETS.SUSCRIPCIONES, [{
+            id: suscripcionId,
+            cliente_id: clienteId,
+            servicio_id: servicio.id,
+            cuenta_id: cuenta.id,
+            perfil_id: perfilId,
+            fecha_inicio: fechaInicio,
+            fecha_fin: fechaFin,
             precio,
-            'activa'
-        ];
-        await sheetsClient.appendRows(CONFIG.SHEETS.SUSCRIPCIONES, [suscripcionRow]);
+            estado: 'activa'
+        }]);
         
         // 3. Crear movimiento
         const movimientoId = await sheetsClient.getNextId(CONFIG.SHEETS.MOVIMIENTOS);
-        const movimientoRow = [
-            movimientoId,
-            'entrada',
-            'venta',
-            precio,
-            clienteId,
-            servicio.id,
-            'efectivo',
-            fechaInicio,
-            session.id,
-            `Venta de ${servicio.nombre} - Perfil #${perfil.numero}`
-        ];
-        await sheetsClient.appendRows(CONFIG.SHEETS.MOVIMIENTOS, [movimientoRow]);
+        await sheetsClient.appendObjects(CONFIG.SHEETS.MOVIMIENTOS, [{
+            id: movimientoId,
+            tipo: 'entrada',
+            categoria: 'venta',
+            monto: precio,
+            cliente_id: clienteId,
+            servicio_id: servicio.id,
+            metodo_pago: 'efectivo',
+            fecha: fechaInicio,
+            usuario_id: session.id,
+            notas: `Venta de ${servicio.nombre} - Perfil #${perfil.numero}`
+        }]);
         
         Utils.showNotification('✅ Perfil asignado correctamente', 'success');
         
@@ -878,15 +957,13 @@ function renderCuentas(data) {
                 <td class="hide-mobile">${estadoBadge}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-primary" onclick="verPerfiles(${cuenta.id})" title="Ver Perfiles">
-                            👁️
+                        <button class="btn btn-sm btn-primary" onclick="verPerfiles(${cuenta.id})" title="Ver Perfiles"><i class="fas fa-eye"></i></button>
                         </button>
                         ${Auth.isAdmin() ? `
-                            <button class="btn btn-sm btn-secondary" onclick="editCuenta(${cuenta.id})" title="Editar">
-                                ✏️
+                            <button class="btn btn-sm btn-secondary" onclick="editCuenta(${cuenta.id})" title="Editar"><i class="fas fa-edit"></i></button>
                             </button>
                             <button class="btn btn-sm btn-danger" onclick="toggleEstadoCuenta(${cuenta.id})" title="${cuenta.estado === 'activa' ? 'Desactivar' : 'Activar'}">
-                                ${cuenta.estado === 'activa' ? '🗑️' : '♻️'}
+                                <i class="fas fa-${cuenta.estado === 'activa' ? 'trash' : 'undo'}"></i>
                             </button>
                         ` : ''}
                     </div>

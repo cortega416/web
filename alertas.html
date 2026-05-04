@@ -65,7 +65,7 @@
         <main class="main-content">
             <div class="topbar">
                 <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i></button>
-                <h2><i class="fas fa-users"></i> Clientes</h2>
+                <h2><i class="fas fa-users"></i>Alertas</h2>
                 <!-- Agregar en el topbar-actions -->
                 <div class="topbar-actions">
                     <button class="btn btn-primary btn-sm" onclick="loadAlertas()">
@@ -97,6 +97,7 @@
                     <div class="filter-group">
                         <select id="filterUrgencia" class="form-control">
                             <option value="">Todas</option>
+                            <option value="vencido">Vencido</option>
                             <option value="critico">Crítico (≤3)</option>
                             <option value="urgente">Urgente (4-7)</option>
                         </select>
